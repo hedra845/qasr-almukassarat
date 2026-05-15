@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الاحترافية — قصر المكسرات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #FF5A9F; --secondary: #9B6DFF; --accent: #FFDF40;
+            --bg: #F5FEFF; --white: #ffffff; --text: #2d1a2e; --text-soft: #5a3e52;
+            --shadow: 0 10px 30px rgba(155, 109, 255, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; min-height: 100vh; line-height: 1.6; }
+
+        nav.admin-nav {
+            background: #fff; padding: 1.2rem 5%; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
+        }
+        .sidebar {
+            width: 280px; background: #fff; position: fixed; top: 70px; bottom: 0; right: 0;
+            padding: 2.5rem; border-left: 1px solid rgba(0,0,0,0.05); overflow-y: auto;
+        }
+        .main-content { margin-right: 280px; padding: 4rem; }
+        .sidebar ul { list-style: none; }
+        .sidebar li { 
+            padding: 1.2rem 1.5rem; border-radius: 16px; cursor: pointer; font-weight: 700;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: var(--text-soft); margin-bottom: 0.8rem;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .sidebar li:hover { background: #fff0f6; color: var(--primary); transform: translateX(-10px); }
+        .sidebar li.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; box-shadow: 0 10px 20px rgba(212, 44, 125, 0.2); }
+
+        .admin-btn {
+            background: var(--primary); color: #fff; border: none; padding: 0.7rem 1.2rem;
+            border-radius: 10px; font-weight: 700; cursor: pointer; font-family: inherit; transition: 0.3s;
+        }
+        .admin-btn.secondary { background: #eee; color: #333; }
+        .admin-btn.danger { background: #ff4d4d; }
+        
+        table { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border-radius: 24px; overflow: hidden; margin-top: 2rem; box-shadow: var(--shadow); }
+        th { background: #fff0f6; padding: 1.5rem; text-align: right; color: var(--secondary); font-weight: 800; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+        td { padding: 1.5rem; border-bottom: 1px solid #f9f9f9; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fffbf5; }
+
+        input, select, textarea {
+            width: 100%; padding: 1.1rem; border: 1.5px solid #eee; border-radius: 14px;
+            margin-bottom: 1.5rem; font-family: inherit; outline: none; transition: 0.3s;
+            background: #fafafa;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(212, 44, 125, 0.1); }
+
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal-content { background: #fff; padding: 2.5rem; border-radius: 24px; width: 100%; max-width: 500px; }
+        
+        .img-preview { width: 100px; height: 100px; border-radius: 15px; object-fit: cover; border: 2px dashed #ddd; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+        <div style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 4rem; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">
+            <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); width: 80px; height: 80px; border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; color: #fff; box-shadow: 0 10px 20px rgba(155, 109, 255, 0.3);">
+                <span style="font-size: 2.5rem;">🏰</span>
+            </div>
+            <h2 style="margin-bottom: 0.5rem; font-weight: 900; color: var(--secondary);">مرحباً بك مجدداً</h2>
+            <p style="color: var(--text-soft); margin-bottom: 2.5rem; font-size: 0.95rem;">سجل دخولك لإدارة قصر المكسرات</p>
+            
+            <div style="text-align: right;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-soft); font-size: 0.9rem;">البريد الإلكتروني</label>
+                <input type="email" id="email" placeholder="admin@example.com" style="margin-bottom: 1.5rem; padding: 1.2rem;">
+                
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-soft); font-size: 0.9rem;">كلمة المرور</label>
+                <input type="password" id="password" placeholder="••••••••" style="margin-bottom: 2rem; padding: 1.2rem;">
+            </div>
+            
+            <button class="admin-btn" style="width: 100%; padding: 1.2rem; font-size: 1.1rem; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 10px;" id="login-btn">
+                <span>دخول للوحة التحكم</span>
+                <span id="login-loader" style="display: none;">⏳</span>
+            </button>
+            
+            <p style="margin-top: 2rem; font-size: 0.85rem; color: #aaa;">&copy; قصر المكسرات — نظام الإدارة المحمي</p>
+        </div>
+    </div>
+</div>
+
+<div id="dashboard" style="display: none;">
+    <nav class="admin-nav">
+        <h3 style="font-weight: 900; color: var(--secondary);">قصر المكسرات 🏰</h3>
+        <button class="admin-btn secondary" onclick="logout()">خروج</button>
+    </nav>
+
+    <div class="sidebar">
+        <ul>
+            <li onclick="switchTab('reports')" id="btn-reports">📊 التقارير</li>
+            <li onclick="switchTab('orders')" id="btn-orders" class="active">📦 الطلبات</li>
+            <li onclick="switchTab('products')" id="btn-products">🥜 المنتجات</li>
+            <li onclick="switchTab('cats')" id="btn-cats">📁 الأقسام</li>
+            <li onclick="switchTab('coupons')" id="btn-coupons">🎟️ الكوبونات</li>
+            <li onclick="switchTab('messages')" id="btn-messages">✉️ الرسائل</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div id="tab-content"></div>
+    </div>
+</div>
+
+<div id="admin-modal" class="modal">
+    <div class="modal-content" id="modal-body"></div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://ndnulanpxtyibqbyxjhw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kbnVsYW5weHR5aWJxYnl4amh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDk2NjIsImV4cCI6MjA5NDE4NTY2Mn0.5ZBZeoUiKdAqO_W0S4X2J1BmDvNBI-z4LuO1aYJDrCs';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let activeTab = 'orders';
+    let categories = [], products = [], orders = [], coupons = [], messages = [];
+
+    document.getElementById('login-btn').onclick = async () => {
+        const btn = document.getElementById('login-btn');
+        const loader = document.getElementById('login-loader');
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) return alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+
+        btn.disabled = true;
+        loader.style.display = 'inline-block';
+
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        
+        btn.disabled = false;
+        loader.style.display = 'none';
+
+        if (error) {
+            alert('خطأ في الدخول: ' + error.message);
+        } else {
+            checkSession();
+        }
+    };
+
+    async function checkSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadData();
+        }
+    }
+    async function logout() { await supabaseClient.auth.signOut(); window.location.reload(); }
+
+    async function loadData() {
+        const { data: c } = await supabaseClient.from('categories').select('*'); categories = c || [];
+        const { data: p } = await supabaseClient.from('products').select('*'); products = p || [];
+        const { data: o } = await supabaseClient.from('orders').select('*').order('created_at', {ascending: false}); orders = o || [];
+        const { data: cp } = await supabaseClient.from('coupons').select('*'); coupons = cp || [];
+        const { data: m } = await supabaseClient.from('contact_messages').select('*').order('created_at', {ascending: false}); messages = m || [];
+        renderTab();
+    }
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+        document.getElementById(`btn-${tab}`).classList.add('active');
+        renderTab();
+    }
+
+    function getImageUrl(path) {
+        if(!path) return '';
+        if(path.startsWith('http')) return path;
+        return `${SUPABASE_URL}/storage/v1/object/public/products/${path}`;
+    }
+
+    function renderTab() {
+        const container = document.getElementById('tab-content');
+        if (activeTab === 'orders') {
+            container.innerHTML = `<h2>📦 الطلبات</h2>` + orders.map(o => `
+                <div style="background:#fff; padding:1.5rem; border-radius:15px; margin-top:1rem; border-right:5px solid ${o.status==='completed'?'green':'#e91e8c'};">
+                    <div style="display:flex; justify-content:space-between;"><strong>الطلب #${o.id}</strong> <b>${o.total_amount} EGP</b></div>
+                    <p>${o.customer_name} - ${o.customer_phone}</p>
+                    <select onchange="updateStatus(${o.id}, this.value)" style="width:auto; margin-top:10px;">
+                        <option value="pending" ${o.status==='pending'?'selected':''}>قيد التنفيذ</option>
+                        <option value="completed" ${o.status==='completed'?'selected':''}>تم التوصيل</option>
+                    </select>
+                </div>
+            `).join('');
+        } else if (activeTab === 'products') {
+            container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🥜 المنتجات</h2><button class="admin-btn" onclick="showProductModal()">+ إضافة منتج</button></div>
+            <table><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>التحكم</th></tr>` + products.map(p => `
+                <tr>
+                    <td><img src="${getImageUrl(p.image_url)}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;"></td>
+                    <td>${p.name}</td>
+                    <td>${p.price} EGP</td>
+                    <td>
+                        <button onclick="showProductModal(${p.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
+                        <button onclick="deleteItem('products', ${p.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
+                    </td>
+                </tr>
+            `).join('') + `</table>`;
+        } else if (activeTab === 'cats') {
+            container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>📁 الأقسام</h2><button class="admin-btn" onclick="showCatModal()">+ إضافة قسم</button></div>
+            <table><tr><th>الاسم</th><th>التحكم</th></tr>` + categories.map(c => `
+                <tr><td>${c.name}</td><td>
+                    <button onclick="showCatModal(${c.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
+                    <button onclick="deleteItem('categories', ${c.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
+                </td></tr>
+            `).join('') + `</table>`;
+        } else if (activeTab === 'coupons') {
+            container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🎟️ الكوبونات</h2><button class="admin-btn" onclick="showCouponModal()">+ إضافة كوبون</button></div>
+            <table><tr><th>الكود</th><th>الخصم</th><th>التحكم</th></tr>` + coupons.map(c => `
+                <tr><td>${c.code}</td><td>${c.discount_percent}%</td><td>
+                    <button onclick="deleteItem('coupons', ${c.id})" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>
+                </td></tr>
+            `).join('') + `</table>`;
+        } else if (activeTab === 'messages') {
+            container.innerHTML = `<h2>✉️ رسائل العملاء</h2>` + messages.map(m => `
+                <div style="background:#fff; padding:1.5rem; border-radius:15px; margin-top:1rem; border-right:4px solid var(--accent);">
+                    <strong>${m.full_name || m.name} (${m.phone})</strong><p>${m.message}</p>
+                </div>
+            `).join('');
+        } else if (activeTab === 'reports') {
+            const rev = orders.reduce((s,o)=>s+(o.total_amount||0), 0);
+            container.innerHTML = `<h2>📊 التقارير</h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+                    <div style="background:#fff; padding:2rem; border-radius:15px; text-align:center;"><h3>إجمالي المبيعات</h3><h2 style="color:var(--primary);">${rev} EGP</h2></div>
+                    <div style="background:#fff; padding:2rem; border-radius:15px; text-align:center;"><h3>عدد الطلبات</h3><h2 style="color:var(--primary);">${orders.length}</h2></div>
+                </div>`;
+        }
+    }
+
+    function openModal(html) { document.getElementById('modal-body').innerHTML = html; document.getElementById('admin-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('admin-modal').style.display = 'none'; }
+
+    async function deleteItem(table, id) {
+        if(!confirm('هل أنت متأكد من الحذف؟')) return;
+        await supabaseClient.from(table).delete().eq('id', id);
+        loadData();
+    }
+
+    async function updateStatus(id, status) {
+        await supabaseClient.from('orders').update({status}).eq('id', id);
+        loadData();
+    }
+
+    // Product Modal with Image Support
+    function showProductModal(id = null) {
+        const p = id ? products.find(x => x.id === id) : { name: '', price: '', category_id: '', image_url: '' };
+        openModal(`
+            <h3>${id ? 'تعديل منتج' : 'إضافة منتج'}</h3>
+            <div style="text-align:center; margin-bottom:1rem;">
+                <img id="m-img-preview" src="${getImageUrl(p.image_url) || 'https://via.placeholder.com/100'}" class="img-preview">
+                <input type="file" id="m-file" style="display:none" onchange="previewFile(this)">
+                <button class="admin-btn secondary" onclick="document.getElementById('m-file').click()" style="display:block; margin:0 auto; font-size:0.8rem;">تغيير الصورة</button>
+            </div>
+            <input id="m-name" value="${p.name}" placeholder="الاسم">
+            <input id="m-price" type="number" value="${p.price}" placeholder="السعر">
+            <select id="m-cat">${categories.map(c => `<option value="${c.id}" ${c.id===p.category_id?'selected':''}>${c.name}</option>`).join('')}</select>
+            <button class="admin-btn" onclick="saveProduct(${id})">حفظ</button>
+            <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
+        `);
+    }
+
+    function previewFile(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => document.getElementById('m-img-preview').src = e.target.result;
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    async function saveProduct(id) {
+        const name = document.getElementById('m-name').value;
+        const price = document.getElementById('m-price').value;
+        const cat = document.getElementById('m-cat').value;
+        const file = document.getElementById('m-file').files[0];
+
+        let imageUrl = id ? products.find(x => x.id === id).image_url : null;
+
+        if (file) {
+            const fileName = `${Date.now()}_${file.name}`;
+            const { data, error } = await supabaseClient.storage.from('products').upload(fileName, file);
+            if(error) return alert('خطأ في رفع الصورة: ' + error.message);
+            imageUrl = fileName;
+        }
+
+        const data = { name, price, category_id: cat, image_url: imageUrl, is_active: true };
+        
+        if(id) await supabaseClient.from('products').update(data).eq('id', id);
+        else await supabaseClient.from('products').insert(data);
+        
+        closeModal(); loadData();
+    }
+
+    // Cat Modal
+    function showCatModal(id = null) {
+        const c = id ? categories.find(x => x.id === id) : { name: '', slug: '' };
+        openModal(`
+            <h3>${id ? 'تعديل قسم' : 'إضافة قسم'}</h3>
+            <input id="m-name" value="${c.name}" placeholder="الاسم">
+            <input id="m-slug" value="${c.slug || ''}" placeholder="Slug">
+            <button class="admin-btn" onclick="saveCat(${id})">حفظ</button>
+            <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
+        `);
+    }
+    async function saveCat(id) {
+        const data = { name: document.getElementById('m-name').value, slug: document.getElementById('m-slug').value };
+        if(id) await supabaseClient.from('categories').update(data).eq('id', id);
+        else await supabaseClient.from('categories').insert(data);
+        closeModal(); loadData();
+    }
+
+    // Coupon Modal
+    function showCouponModal() {
+        openModal(`
+            <h3>إضافة كوبون</h3>
+            <input id="m-code" placeholder="الكود">
+            <input id="m-percent" type="number" placeholder="النسبة %">
+            <button class="admin-btn" onclick="saveCoupon()">حفظ</button>
+            <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
+        `);
+    }
+    async function saveCoupon() {
+        await supabaseClient.from('coupons').insert({ code: document.getElementById('m-code').value, discount_percent: document.getElementById('m-percent').value });
+        closeModal(); loadData();
+    }
+
+    checkSession();
+</script>
+</body>
+</html>

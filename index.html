@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قصر المكسرات — المذاق الملكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #FF5A9F;
+            --secondary: #9B6DFF;
+            --accent: #FFDF40;
+            --bg: #F5FEFF;
+            --white: #ffffff;
+            --text: #2d1a2e;
+            --text-soft: #5a3e52;
+            --shadow: 0 10px 30px rgba(155, 109, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ── GLOBAL POLISH ── */
+        ::selection {
+            background: rgba(255, 90, 159, 0.3);
+            color: var(--secondary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* ── CANDY RAIN ── */
+        .candy-rain {
+            position: fixed;
+            top: -50px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .candy {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: fall linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* ── DECORATIVE SHAPES ── */
+        .shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: move 20s infinite alternate;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -10%;
+            left: -10%;
+            opacity: 0.4;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            bottom: -10%;
+            right: -10%;
+            opacity: 0.3;
+        }
+
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+
+            to {
+                transform: translate(100px, 100px);
+            }
+        }
+
+        /* ── UI ── */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        nav {
+            padding: 1.2rem 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: 0.4s;
+        }
+
+        nav.scrolled {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 8%;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            transition: 0.3s;
+            border-radius: 10px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cart-btn {
+            background: var(--white);
+            color: var(--secondary);
+            border: 1px solid rgba(131, 12, 79, 0.1);
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cart-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .cart-btn.active,
+        .cart-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(212, 44, 125, 0.3);
+            transform: translateY(-3px) scale(1.02);
+            border-color: transparent;
+        }
+
+        .cart-btn:hover::before {
+            left: 100%;
+        }
+
+        .cart-count-badge {
+            background: var(--accent);
+            color: var(--text);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(255, 184, 0, 0.3);
+        }
+
+        /* Hero */
+        #hero {
+            min-height: 90vh;
+            padding: 6rem 8% 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+            background: radial-gradient(circle at 10% 20%, rgba(255, 248, 240, 0.4) 0%, rgba(255, 248, 240, 0) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-text {
+            flex: 1;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .hero-text h1 em {
+            color: var(--primary);
+            font-style: normal;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-text h1 em::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background: var(--accent);
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 10px;
+        }
+
+        .hero-text p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            color: #5a3e52;
+        }
+
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 600px;
+        }
+
+        .visual-container {
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 90, 159, 0.1), rgba(155, 109, 255, 0.2));
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: absolute;
+            z-index: 1;
+        }
+
+        .hero-girl-img {
+            width: 520px;
+            height: 520px;
+            object-fit: cover;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            z-index: 2;
+            position: relative;
+            transform: translateY(-20px);
+            filter: drop-shadow(0 30px 60px rgba(131, 12, 79, 0.2));
+            animation: morphing 15s infinite alternate ease-in-out, floating 6s infinite ease-in-out;
+            border: 8px solid #fff;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(-20px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-40px) rotate(2deg);
+            }
+        }
+
+        @keyframes morphing {
+            0% {
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+
+            25% {
+                border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+            }
+
+            50% {
+                border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+            }
+
+            75% {
+                border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+            }
+
+            100% {
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+        }
+
+        /* Sections */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 0.8s all ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card {
+            padding: 3.5rem 2.5rem;
+            border-radius: 40px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: 0.5s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-20px);
+            box-shadow: 0 40px 80px rgba(131, 12, 79, 0.15);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon-wrapper {
+            width: 90px;
+            height: 90px;
+            background: #fff0f6;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+            color: var(--primary);
+            transition: 0.5s;
+            font-size: 2rem;
+        }
+
+        .feature-card:hover .feature-icon-wrapper {
+            background: var(--primary);
+            color: #fff;
+            transform: rotateY(180deg);
+        }
+
+        /* Products */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .card {
+            padding: 1rem;
+            border-radius: 30px;
+            background: #fff;
+            transition: 0.4s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255, 90, 159, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(131, 12, 79, 0.1);
+            border-color: rgba(255, 90, 159, 0.2);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background: #fdf2f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card:hover .card-img img {
+            transform: scale(1.08);
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            padding: 0 0.5rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .card .price {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .card .add-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 20px rgba(255, 90, 159, 0.3);
+        }
+
+        .card .add-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 12px 25px rgba(155, 109, 255, 0.4);
+        }
+
+        /* Cart Overlay */
+        #cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(45, 26, 46, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .cart-panel {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            background: var(--white);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
+            border-radius: 40px;
+            position: relative;
+            animation: dialogPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow-y: auto;
+        }
+
+        @keyframes dialogPop {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .pay-method-label {
+            flex: 1;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: 0.3s;
+            color: var(--text);
+        }
+
+        .pay-method-label:has(input:checked) {
+            border-color: var(--primary);
+            background: rgba(255, 90, 159, 0.05);
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(255, 90, 159, 0.15);
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 16px;
+            border: 2px solid transparent;
+            outline: none;
+            margin-bottom: 1.2rem;
+            font-family: inherit;
+            text-align: right;
+            background: #f8f9fa;
+            transition: 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            font-size: 1rem;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 90, 159, 0.1), inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        #mascot {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 3000;
+            animation: mascotFloat 3s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        @keyframes mascotFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .mascot-img {
+            width: 100px;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+        }
+
+        #whatsapp-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3000;
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        /* ── TALKING MASCOT ── */
+        #mascot-container {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 4000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .speech-bubble {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            position: relative;
+            box-shadow: var(--shadow);
+            animation: talkBubble 4s infinite;
+            opacity: 0;
+            backdrop-filter: blur(10px);
+            color: var(--secondary);
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: rgba(255, 255, 255, 0.7) transparent transparent;
+        }
+
+        .mascot-char {
+            width: 100px;
+            filter: drop-shadow(0 15px 25px rgba(131, 12, 79, 0.2));
+            animation: mascotBounce 3s infinite ease-in-out;
+            transition: 0.3s;
+        }
+
+        .mascot-char:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Spin Wheel */
+        #wheel-trigger {
+            position: fixed;
+            bottom: 110px;
+            left: 30px;
+            width: 65px;
+            height: 65px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 4500;
+            box-shadow: 0 10px 25px rgba(255, 223, 64, 0.4);
+            animation: pulseGift 2s infinite;
+            transition: 0.3s;
+        }
+
+        @keyframes pulseGift {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 223, 64, 0.7);
+            }
+
+            70% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 15px rgba(255, 223, 64, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 223, 64, 0);
+            }
+        }
+
+        #wheel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            z-index: 6000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .wheel-container {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 50px;
+            text-align: center;
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .wheel-canvas-container {
+            position: relative;
+            margin: 2rem auto;
+            width: 300px;
+            height: 300px;
+        }
+
+        #wheel-pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid var(--primary);
+            z-index: 10;
+        }
+
+        canvas#wheel {
+            border-radius: 50%;
+            box-shadow: 0 0 0 10px #f0f0f0, 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes talkBubble {
+
+            0%,
+            10%,
+            90%,
+            100% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            20%,
+            80% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes mascotBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        /* Admin Link */
+        .admin-link {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            z-index: 5000;
+            box-shadow: 0 15px 30px rgba(155, 109, 255, 0.3);
+            transition: 0.4s;
+        }
+
+        .admin-link:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        @media (max-width: 768px) {
+            #hero {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-visual {
+                width: 300px;
+                height: 300px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .admin-link {
+                left: auto;
+                right: 30px;
+                bottom: 100px;
+            }
+        }
+
+        /* Testimonials Swiper Customization */
+        .testimonials-slider {
+            padding-bottom: 80px !important;
+            /* مسافة إضافية للنقاط */
+        }
+
+        .testimonials-slider .swiper-pagination-bullet {
+            background: var(--primary);
+            opacity: 0.3;
+        }
+
+        .testimonials-slider .swiper-pagination-bullet-active {
+            opacity: 1;
+            width: 25px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .testimonials-slider .swiper-pagination {
+            bottom: 20px !important;
+        }
+
+        .testimonials-slider .swiper-slide {
+            height: auto;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body style="overflow-x: hidden;">
+
+    <div class="candy-rain" id="candy-container"></div>
+
+    <!-- Spin Wheel -->
+    <div id="wheel-trigger" onclick="openWheel()">
+        <i data-lucide="gift" style="width:30px; height:30px;"></i>
+    </div>
+
+    <div id="wheel-overlay">
+        <div class="wheel-container">
+            <button onclick="closeWheel()"
+                style="position:absolute; top:2rem; right:2rem; border:none; background:none; font-size:1.5rem; cursor:pointer;"><i
+                    data-lucide="x"></i></button>
+            <h2 style="font-weight:900; color:var(--secondary);">عجلة الهدايا الملكية 🎡</h2>
+            <p style="margin-top:1rem; color:var(--text-soft);">أدر العجلة واربح خصماً فورياً على طلبك!</p>
+            <div class="wheel-canvas-container">
+                <div id="wheel-pointer"></div>
+                <canvas id="wheel" width="300" height="300"></canvas>
+            </div>
+            <button class="cart-btn" id="spin-btn"
+                style="width:100%; justify-content:center; padding:1.2rem; font-size:1.2rem;" onclick="spinWheel()">أدر
+                العجلة الآن!</button>
+            <div id="wheel-result" style="margin-top:2rem; font-size:1.3rem; font-weight:900; color:var(--primary);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Access -->
+    <a href="admin.html" class="admin-link" title="الإدارة">
+        <i data-lucide="lock" style="width:28px; height:28px;"></i>
+    </a>
+
+    <!-- Talking Mascot -->
+    <div id="mascot-container" onclick="window.open('https://wa.me/201551407492', '_blank')">
+        <div class="speech-bubble" id="mascot-text">أهلاً بك في قصرنا! ✨</div>
+        <img src="https://cdn-icons-png.flaticon.com/512/3408/3408455.png" class="mascot-char" alt="Mascot Character">
+    </div>
+
+    <nav class="glass">
+        <a href="#" class="logo">قصر المكسرات <i data-lucide="store" style="width:24px;"></i></a>
+        <ul class="nav-links">
+            <li><a href="#hero">الرئيسية</a></li>
+            <li><a href="#products">المنتجات</a></li>
+            <li><a href="#track-order">تتبع طلبك</a></li>
+            <li><a href="#about">من نحن</a></li>
+        </ul>
+        <button class="cart-btn" onclick="toggleCart()">
+            <i data-lucide="shopping-cart" style="width: 20px;"></i>
+            <span class="cart-count-badge" id="cart-count">0</span>
+        </button>
+    </nav>
+
+    <section id="hero" class="reveal">
+        <div class="hero-text">
+            <div
+                style="background: var(--primary); color: #fff; display: inline-block; padding: 5px 15px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; margin-bottom: 1.5rem; letter-spacing: 1px;">
+                طبيعي 100% فريش</div>
+            <h1>مذاق <em>الملوك</em><br>بين يديك الآن</h1>
+            <p>نحن في قصر المكسرات نختار لك الأجود من محاصيل العالم، لنقدم لك تجربة مذاق غنية بالفوائد والطعم الطازج
+                الذي يليق بذوقك الرفيع.</p>
+            <div style="display: flex; gap: 1.5rem; align-items: center;">
+                <button class="cart-btn" style="padding: 1.2rem 3rem; font-size: 1.1rem;"
+                    onclick="document.getElementById('products').scrollIntoView()">استكشف المنتجات ↓</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex;">
+                        <i data-lucide="star" style="width:16px; color:var(--accent); fill:var(--accent);"></i>
+                        <i data-lucide="star" style="width:16px; color:var(--accent); fill:var(--accent);"></i>
+                        <i data-lucide="star" style="width:16px; color:var(--accent); fill:var(--accent);"></i>
+                        <i data-lucide="star" style="width:16px; color:var(--accent); fill:var(--accent);"></i>
+                        <i data-lucide="star" style="width:16px; color:var(--accent); fill:var(--accent);"></i>
+                    </div>
+                    <span style="font-weight: 700; font-size: 0.9rem; opacity: 0.7;">+10,000 عميل سعيد</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="visual-container"></div>
+            <img src="hero-girl.jpg" class="hero-girl-img" alt="قصر المكسرات">
+            <!-- Decorative elements -->
+            <div
+                style="position: absolute; top: 10%; right: 0; background: #fff; padding: 15px; border-radius: 20px; box-shadow: var(--shadow); z-index: 3; display: flex; align-items: center; gap: 10px; animation: float 4s infinite;">
+                <i data-lucide="award" style="color: var(--accent); width: 30px; height: 30px;"></i>
+                <div><strong style="display: block; font-size: 0.8rem;">جودة ملكية</strong><small
+                        style="opacity: 0.7;">مختارة بعناية</small></div>
+            </div>
+            <div
+                style="position: absolute; bottom: 10%; left: 0; background: #fff; padding: 15px; border-radius: 20px; box-shadow: var(--shadow); z-index: 3; display: flex; align-items: center; gap: 10px; animation: float 6s infinite reverse;">
+                <i data-lucide="zap" style="color: var(--primary); width: 30px; height: 30px;"></i>
+                <div><strong style="display: block; font-size: 0.8rem;">توصيل سريع</strong><small
+                        style="opacity: 0.7;">خلال 24 ساعة</small></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ FEATURES SECTION ══ -->
+    <section id="features" class="reveal" style="padding: 8rem 8%; text-align: center;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 3rem;">
+            <div class="glass feature-card">
+                <div class="feature-icon-wrapper">
+                    <i data-lucide="truck" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3 style="margin-bottom: 1.2rem; color: var(--secondary); font-size: 1.5rem;">توصيل ملكي</h3>
+                <p style="color: #7a4a6a; font-size: 1rem; line-height: 1.7;">نصلك في أسرع وقت ممكن في كافة أنحاء
+                    الجمهورية لضمان جودة وطزاجة المكسرات.</p>
+            </div>
+            <div class="glass feature-card">
+                <div class="feature-icon-wrapper">
+                    <i data-lucide="gem" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3 style="margin-bottom: 1.2rem; color: var(--secondary); font-size: 1.5rem;">جودة ملكية</h3>
+                <p style="color: #7a4a6a; font-size: 1rem; line-height: 1.7;">نختار حباتنا بعناية فائقة ونخضعها لأعلى
+                    معايير الجودة لنضمن لك المذاق الأصلي الفاخر.</p>
+            </div>
+            <div class="glass feature-card">
+                <div class="feature-icon-wrapper">
+                    <i data-lucide="gift" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3 style="margin-bottom: 1.2rem; color: var(--secondary); font-size: 1.5rem;">تغليف فاخر</h3>
+                <p style="color: #7a4a6a; font-size: 1rem; line-height: 1.7;">عبواتنا مصممة بعناية لتعبر عن رقي اختيارك،
+                    وهي مثالية لتقدمها كهدية قيمة لمن تحب.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ ABOUT US SECTION ══ -->
+    <section id="about" class="reveal" style="padding: 8rem 8%;">
+        <div
+            style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 5rem; align-items: center; position: relative;">
+            <div>
+                <h2
+                    style="font-size: 3.5rem; font-weight: 900; margin-bottom: 2rem; color: var(--secondary); line-height: 1.2;">
+                    حكايتنا في <br><em>قصر المكسرات</em></h2>
+                <p style="font-size: 1.25rem; line-height: 2; margin-bottom: 2.5rem; color: #5a3e52; opacity: 0.9;">
+                    بدأنا برؤية بسيطة: أن نجعل من كل حبة مكسرات تجربة ملكية. نجمع لك خيرات الأرض من أجود المحاصيل
+                    العالمية، ونحمصها بشغف لتصلك طازجة، محتفظة بكل فوائدها وعبيرها الأصلي.</p>
+                <div style="display: flex; gap: 4rem;">
+                    <div style="text-align: right;">
+                        <h3 style="color: var(--primary); font-size: 3rem; font-weight: 900;">+٢٠</h3>
+                        <p style="font-weight: 700; color: var(--secondary); font-size: 1.1rem;">صنفاً فاخراً</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h3 style="color: var(--primary); font-size: 3rem; font-weight: 900;">١٠٠٪</h3>
+                        <p style="font-weight: 700; color: var(--secondary); font-size: 1.1rem;">طبيعي وطازج</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-visual" style="position: relative;">
+                <div
+                    style="position: absolute; inset: -30px; border: 3px solid var(--primary); border-radius: 50px; opacity: 0.1; transform: rotate(-5deg); z-index: 0;">
+                </div>
+                <img src="https://images.unsplash.com/photo-1511381939415-e44015466834?q=80&w=2144&auto=format&fit=crop"
+                    style="width:100%; border-radius:50px; box-shadow: var(--shadow); position: relative; z-index: 1;"
+                    alt="حلويات فاخرة">
+                <div
+                    style="position: absolute; bottom: -20px; right: -20px; background: var(--accent); width: 100px; height: 100px; border-radius: 30px; z-index: 2; display: flex; align-items: center; justify-content: center; transform: rotate(15deg); box-shadow: var(--shadow);">
+                    <i data-lucide="award" style="color: #fff; width: 50px; height: 50px;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ PRODUCTS SECTION ══ -->
+    <section id="products" class="reveal" style="padding: 10rem 8%;">
+        <div style="text-align: center; margin-bottom: 6rem;">
+            <h2 style="font-size: 4rem; font-weight: 900; color: var(--secondary); margin-bottom: 1rem;">قائمتنا
+                <em>المختارة</em></h2>
+            <p style="color: var(--text-soft); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">اختر ما تشتهيه من
+                أجود أنواع المكسرات والحلويات المحمصة طازجاً في قصرنا.</p>
+            <div id="cat-list"
+                style="display: flex; justify-content: center; gap: 1rem; margin-top: 4rem; flex-wrap: wrap;"></div>
+        </div>
+        <div class="products-grid" id="products-grid"></div>
+    </section>
+
+    <!-- ══ ORDER TRACKING ══ -->
+    <section id="track-order" class="reveal" style="padding: 8rem 8%; text-align: center;">
+        <div class="glass"
+            style="max-width: 800px; margin: 0 auto; padding: 5rem; border-radius: 50px; border: 1px solid rgba(233, 30, 140, 0.2); position: relative;">
+            <div
+                style="position: absolute; top: 20px; left: 20px; font-size: 3rem; opacity: 0.1; color: var(--primary);">
+                <i data-lucide="package" style="width:60px; height:60px;"></i></div>
+            <h2 style="font-size: 2.8rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--secondary);">تتبع رحلة
+                طلبك</h2>
+            <p style="color: #7a4a6a; margin-bottom: 3rem; font-size: 1.1rem;">أدخل رقم الطلب لتعرف أين وصلت مكسراتك
+                المفضلة</p>
+
+            <div
+                style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; background: #fff; padding: 0.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <input type="text" id="track-id" placeholder="رقم الطلب (مثال: 123)"
+                    style="flex: 1; min-width: 250px; margin-bottom: 0; border: none; background: transparent; text-align: center; font-size: 1.2rem;">
+                <button class="cart-btn" onclick="trackOrder()"
+                    style="padding: 1.2rem 3.5rem; border-radius: 15px;">تتبع الآن</button>
+            </div>
+
+            <div id="track-result" style="margin-top: 3.5rem;"></div>
+        </div>
+    </section>
+
+    <!-- ══ TESTIMONIALS ══ -->
+    <section id="testimonials" class="reveal"
+        style="padding: 10rem 8%; text-align: center; background: linear-gradient(to bottom, rgba(155, 109, 255, 0.05), transparent);">
+        <div style="margin-bottom: 6rem;">
+            <h2 style="font-size: 3.5rem; font-weight: 900; color: var(--secondary); line-height: 1.2;">آراء تملؤنا
+                <em>بالفخر</em></h2>
+            <p style="color: var(--text-soft); margin-top: 1.5rem; font-size: 1.2rem;">ثقة عملائنا هي الوقود الذي يدفعنا
+                للتميز دائماً</p>
+        </div>
+
+        <div class="swiper testimonials-slider" style="max-width: 1200px; margin: 0 auto; padding: 3rem 1rem 5rem;">
+            <div class="swiper-wrapper" id="testimonials-grid">
+                <!-- Reviews load here as swiper-slides -->
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <div style="margin-top: 6rem;">
+            <button class="cart-btn" style="margin-inline: auto; padding: 1.2rem 4rem; font-size: 1.1rem;"
+                onclick="openReviewModal()">
+                أضف رأيك الخاص <i data-lucide="plus-circle"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- ══ REVIEW MODAL ══ -->
+    <div id="review-overlay"
+        style="position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); z-index:3000; display:none; align-items:center; justify-content:center; padding:1.5rem;">
+        <div class="glass"
+            style="width:100%; max-width:500px; background:#fff; border-radius:30px; padding:3rem; position:relative;">
+            <button onclick="closeReviewModal()"
+                style="position:absolute; top:1.5rem; right:1.5rem; background:none; border:none; font-size:1.5rem; cursor:pointer;"><i
+                    data-lucide="x"></i></button>
+            <h2 style="margin-bottom:2rem; font-weight:900; display:flex; align-items:center; gap:12px;">أضف تقييمك <i
+                    data-lucide="star" style="color:var(--accent);"></i></h2>
+            <input type="text" id="rev-name" placeholder="اسمك الكريم">
+            <select id="rev-rating">
+                <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
+                <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
+                <option value="3">⭐⭐⭐ (جيد)</option>
+                <option value="2">⭐⭐ (مقبول)</option>
+                <option value="1">⭐ (ضعيف)</option>
+            </select>
+            <textarea id="rev-comment" placeholder="اكتب رأيك هنا بكل صراحة..." style="height:120px;"></textarea>
+            <button class="cart-btn" style="width:100%; justify-content:center; padding:1.2rem;"
+                onclick="submitReview()">إرسال التقييم <i data-lucide="send"></i></button>
+        </div>
+    </div>
+
+    <!-- ══ CONTACT US FORM ══ -->
+    <section id="contact-form-section" class="reveal" style="padding: 8rem 8%;">
+        <div
+            style="max-width: 1200px; margin: 0 auto; background: var(--white); border-radius: 60px; overflow: hidden; box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr 1.5fr;">
+            <!-- Contact Info -->
+            <div
+                style="background: linear-gradient(135deg, var(--secondary), var(--primary)); padding: 5rem; color: #fff; display: flex; flex-direction: column; justify-content: center; gap: 3rem;">
+                <div>
+                    <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 1.5rem;">تواصل معنا</h2>
+                    <p style="opacity: 0.8; font-size: 1.1rem;">نحن هنا دائماً لخدمتكم والإجابة على استفساراتكم بكل حب.
+                    </p>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div
+                            style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            <i data-lucide="phone"></i></div>
+                        <div>
+                            <h4 style="opacity: 0.7; font-size: 0.9rem;">اتصل بنا</h4>
+                            <p style="font-weight: 700; font-size: 1.2rem;">01551407492</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div
+                            style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            <i data-lucide="mail"></i></div>
+                        <div>
+                            <h4 style="opacity: 0.7; font-size: 0.9rem;">البريد الإلكتروني</h4>
+                            <p style="font-weight: 700; font-size: 1.2rem;">info@qasr-almukassarat.com</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem;">
+                        <div
+                            style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                            <i data-lucide="map-pin"></i></div>
+                        <div>
+                            <h4 style="opacity: 0.7; font-size: 0.9rem;">الموقع</h4>
+                            <p style="font-weight: 700; font-size: 1.2rem;">القاهرة، مصر</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div style="padding: 5rem;">
+                <form id="contact-form" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div><label style="display: block; margin-bottom: 0.8rem; font-weight: 700;">الاسم
+                                الكامل</label><input type="text" id="con-name" placeholder="اسمك الكريم" required
+                                style="margin-bottom:0;"></div>
+                        <div><label style="display: block; margin-bottom: 0.8rem; font-weight: 700;">رقم
+                                الهاتف</label><input type="tel" id="con-phone" placeholder="0123456789" required
+                                style="margin-bottom:0;"></div>
+                    </div>
+                    <div><label style="display: block; margin-bottom: 0.8rem; font-weight: 700;">رسالتك</label><textarea
+                            id="con-msg" placeholder="كيف يمكننا مساعدتك اليوم؟"
+                            style="height: 180px; margin-bottom: 0;" required></textarea></div>
+                    <button type="submit" class="cart-btn"
+                        style="width: 100%; justify-content: center; padding: 1.3rem; font-size: 1.2rem; margin-top: 1rem;">
+                        إرسال الرسالة <i data-lucide="send" style="width: 20px;"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="reveal"
+        style="background: var(--white); padding: 5rem 8% 2rem; border-top: 1px solid #eee; margin-top: 6rem;">
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 4rem; margin-bottom: 4rem;">
+            <div>
+                <h2 style="color: var(--secondary); font-weight: 900; margin-bottom: 1.5rem;">قصر المكسرات 🏰</h2>
+                <p style="color: #7a4a6a; line-height: 1.8;">نحن نهتم بأدق التفاصيل لنقدم لكم أفضل مكسرات وحلويات في
+                    مصر، بجودة ملكية وطعم لا يُنسى.</p>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 1.5rem;">روابط سريعة</h3>
+                <ul style="list-style: none; line-height: 2.5;">
+                    <li><a href="#hero" style="text-decoration: none; color: #555;">الرئيسية</a></li>
+                    <li><a href="#products" style="text-decoration: none; color: #555;">منتجاتنا</a></li>
+                    <li><a href="#track-order" style="text-decoration: none; color: #555;">تتبع طلبك</a></li>
+                    <li><a href="#contact-form-section" style="text-decoration: none; color: #555;">تواصل معنا</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 1.5rem;">تواصل معنا</h3>
+                <p style="color: #555; margin-bottom: 0.5rem;">📍 القاهرة، مصر</p>
+                <p style="color: #555; margin-bottom: 0.5rem;">📞 01551407492</p>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <a href="#" style="color: var(--primary); font-size: 1.5rem;"><i data-lucide="facebook"></i></a>
+                    <a href="#" style="color: var(--primary); font-size: 1.5rem;"><i data-lucide="instagram"></i></a>
+                    <a href="#" style="color: var(--primary); font-size: 1.5rem;"><i data-lucide="twitter"></i></a>
+                </div>
+            </div>
+        </div>
+        <div
+            style="border-top: 1px solid #eee; padding-top: 2rem; text-align: center; color: #aaa; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <p>&copy; ٢٠٢٤ قصر المكسرات — جميع الحقوق محفوظة.</p>
+            <a href="https://www.facebook.com/share/1NXDD56o3q/" target="_blank"
+                style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 8px 20px; border-radius: 50px; color: #555; font-weight: 700; transition: 0.3s; border: 1px solid #eee; font-size: 0.8rem;">
+                تم التطوير بواسطة <span style="color: var(--primary);">hedra.dev</span>
+                <i data-lucide="external-link" style="width: 14px;"></i>
+            </a>
+        </div>
+    </footer>
+
+    <!-- ══ CART PANEL ══ -->
+    <div id="cart-overlay" onclick="toggleCart()">
+        <div class="cart-panel glass" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <h2 style="font-weight: 900; color: var(--secondary); display: flex; align-items: center; gap: 12px; margin: 0;">
+                    سلة المشتريات <i data-lucide="shopping-bag" style="color: var(--primary);"></i>
+                </h2>
+                <button onclick="toggleCart()" style="background: rgba(255, 90, 159, 0.1); color: var(--primary); width: 40px; height: 40px; border-radius: 12px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;">
+                    <i data-lucide="x" style="width: 20px;"></i>
+                </button>
+            </div>
+            
+            <!-- Items -->
+            <div id="cart-items" style="flex: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 1.5rem;"></div>
+            
+            <!-- Checkout Section -->
+            <div id="checkout-section" style="display: none; padding-top: 1.5rem; border-top: 1px dashed rgba(0,0,0,0.1);">
+                <div class="checkout-form">
+                    <h3 style="margin-bottom: 1.5rem; font-weight: 800; color: var(--secondary); display: flex; align-items: center; gap: 10px;">
+                        بيانات الشحن <i data-lucide="truck" style="color: var(--primary); width: 22px;"></i>
+                    </h3>
+                    
+                    <input type="text" id="co-name" placeholder="الاسم بالكامل">
+                    <input type="tel" id="co-phone" placeholder="رقم الهاتف">
+                    <select id="co-city">
+                        <option value="">اختر المدينة</option>
+                        <option value="Cairo">القاهرة</option>
+                        <option value="Giza">الجيزة</option>
+                        <option value="Alexandria">الإسكندرية</option>
+                        <option value="Other">محافظة أخرى</option>
+                    </select>
+                    <textarea id="co-address" placeholder="العنوان بالتفصيل" style="height: 90px;"></textarea>
+
+                    <h4 style="margin: 1rem 0 0.8rem; color: var(--text-soft); font-weight: 700;">طريقة الدفع</h4>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <label class="pay-method-label">
+                            <input type="radio" name="pay" value="cod" checked style="display: none;" onchange="toggleInstapayInfo()">
+                            <i data-lucide="banknote" style="color: #28a745;"></i> كاش
+                        </label>
+                        <label class="pay-method-label">
+                            <input type="radio" name="pay" value="instapay" style="display: none;" onchange="toggleInstapayInfo()">
+                            <i data-lucide="smartphone" style="color: #6f42c1;"></i> انستاباي
+                        </label>
+                    </div>
+
+                    <div id="instapay-info" style="display: none; background: #fcf8ff; border: 1px dashed rgba(111, 66, 193, 0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
+                        <i data-lucide="info" style="color: #6f42c1; margin-bottom: 0.5rem; width: 24px; height: 24px; display: inline-block;"></i>
+                        <p style="font-weight: 700; color: var(--text); margin-bottom: 0.5rem;">الرجاء تحويل المبلغ على الرقم التالي:</p>
+                        <h3 style="color: #6f42c1; letter-spacing: 2px; font-weight: 900; user-select: all; cursor: copy;" title="انسخ الرقم">01551407492</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-soft); margin-top: 0.5rem;">سيتم تأكيد طلبك فور استلام التحويل.</p>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; background: #f8f9fa; padding: 5px; border-radius: 20px;">
+                        <input type="text" id="coupon-code" placeholder="كود الخصم (اختياري)" style="margin-bottom: 0; background: transparent; box-shadow: none; border: none; flex: 1;">
+                        <button class="cart-btn" onclick="applyCoupon()" style="padding: 0 1.5rem; margin: 0; border-radius: 15px;">تطبيق</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div style="margin-top: 1rem; background: #fffafc; padding: 1.5rem; border-radius: 24px; border: 1px solid rgba(255, 90, 159, 0.1);">
+                <div style="display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--secondary);">
+                    <span>الإجمالي:</span>
+                    <span id="cart-total" style="color: var(--primary);">0 EGP</span>
+                </div>
+                <button id="main-cart-btn" class="cart-btn" style="width: 100%; justify-content: center; padding: 1.2rem; font-size: 1.1rem;" onclick="goToCheckOut()">
+                    إتمام الطلب <i data-lucide="arrow-left" style="width: 20px;"></i>
+                </button>
+                <button id="submit-btn" class="cart-btn" style="width: 100%; justify-content: center; padding: 1.2rem; font-size: 1.1rem; display: none; gap: 10px; background: linear-gradient(135deg, #28a745, #20c997); color: #fff; border: none; box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);">
+                    تأكيد الطلب نهائياً <i data-lucide="check-circle-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ndnulanpxtyibqbyxjhw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kbnVsYW5weHR5aWJxYnl4amh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MDk2NjIsImV4cCI6MjA5NDE4NTY2Mn0.5ZBZeoUiKdAqO_W0S4X2J1BmDvNBI-z4LuO1aYJDrCs';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allProducts = [], categories = [], cart = [], activeCat = 'all', activeCoupon = null;
+
+        function toggleInstapayInfo() {
+            const isInstapay = document.querySelector('input[name="pay"]:checked').value === 'instapay';
+            document.getElementById('instapay-info').style.display = isInstapay ? 'block' : 'none';
+        }
+
+        async function init() {
+            const { data: catData } = await supabaseClient.from('categories').select('*');
+            categories = catData || []; renderCategories();
+            const { data: prodData } = await supabaseClient.from('products').select('*').eq('is_active', true);
+            allProducts = prodData || []; renderProducts();
+            loadTestimonials();
+
+            // Mascot Talking logic
+            const messages = ["أهلاً بك في قصرنا! ✨", "هل جربت فستقنا الفاخر؟ 😋", "أفضل المكسرات بانتظارك! 🏰", "اطلب الآن واستمتع بالمذاق! 🛒"];
+            let msgIdx = 0;
+            setInterval(() => {
+                const bubble = document.getElementById('mascot-text');
+                if (bubble) {
+                    msgIdx = (msgIdx + 1) % messages.length;
+                    bubble.innerText = messages[msgIdx];
+                }
+            }, 4000);
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('cat-list');
+            let html = `<button class="cart-btn ${activeCat === 'all' ? 'active' : ''}" onclick="filterByCat('all')"><i data-lucide="layout-grid" style="width:16px;"></i> الكل</button>`;
+            categories.forEach(c => {
+                html += `<button class="cart-btn ${activeCat == c.id ? 'active' : ''}" onclick="filterByCat(${c.id})">${c.name}</button>`;
+            });
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function filterByCat(id) { activeCat = id; renderCategories(); renderProducts(); }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const filtered = activeCat === 'all' ? allProducts : allProducts.filter(p => p.category_id == activeCat);
+            grid.innerHTML = filtered.map(p => `
+            <div class="card glass">
+                <div class="card-img"><img src="${getImageUrl(p.image_url)}" alt="${p.name}"></div>
+                <h3>${p.name}</h3>
+                <div class="card-footer">
+                    <div class="price">${p.price} EGP</div>
+                    <button class="add-btn" onclick="addToCart(${p.id})" title="إضافة للسلة">
+                        <i data-lucide="plus" style="width:22px; height:22px;"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+            lucide.createIcons();
+        }
+
+        function getImageUrl(p) {
+            if (!p) return 'https://via.placeholder.com/300';
+            if (p.startsWith('http')) return p;
+            return `${SUPABASE_URL}/storage/v1/object/public/products/${p}`;
+        }
+
+        function addToCart(id) {
+            const prod = allProducts.find(p => p.id === id);
+            const exists = cart.find(item => item.id === id);
+            if (exists) exists.qty++; else cart.push({ ...prod, qty: 1 });
+            updateCart();
+        }
+
+        function updateCart() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <div><strong>${item.name}</strong><br><small>${item.price} EGP x ${item.qty}</small></div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button onclick="changeQty(${item.id}, -1)" style="width:30px; height:30px; border-radius:50%; border:1px solid #ddd;">-</button>
+                    <span>${item.qty}</span>
+                    <button onclick="changeQty(${item.id}, 1)" style="width:30px; height:30px; border-radius:50%; border:1px solid #ddd;">+</button>
+                </div>
+            </div>
+        `).join('');
+            const total = cart.reduce((s, c) => s + (c.price * c.qty), 0);
+            const finalTotal = activeCoupon ? total - (total * (activeCoupon.discount_percent / 100)) : total;
+            document.getElementById('cart-total').innerText = `${finalTotal} EGP`;
+            document.getElementById('cart-count').innerText = cart.reduce((s, c) => s + c.qty, 0);
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(x => x.id === id);
+            item.qty += delta;
+            if (item.qty <= 0) cart = cart.filter(x => x.id !== id);
+            updateCart();
+        }
+
+        function toggleCart() {
+            const overlay = document.getElementById('cart-overlay');
+            overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+            document.getElementById('checkout-section').style.display = 'none';
+            document.getElementById('main-cart-btn').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+        }
+
+        function goToCheckOut() {
+            if (cart.length === 0) return alert('السلة فارغة!');
+            document.getElementById('checkout-section').style.display = 'block';
+            document.getElementById('main-cart-btn').style.display = 'none';
+            document.getElementById('submit-btn').style.display = 'block';
+        }
+
+        async function applyCoupon() {
+            const code = document.getElementById('coupon-code').value;
+            const { data, error } = await supabaseClient.from('coupons').select('*').eq('code', code).single();
+            if (data) { activeCoupon = data; alert(`تم تطبيق خصم ${data.discount_percent}%`); updateCart(); }
+            else alert('كود غير صحيح');
+        }
+
+        document.getElementById('submit-btn').onclick = async () => {
+            const name = document.getElementById('co-name').value;
+            const phone = document.getElementById('co-phone').value;
+            const city = document.getElementById('co-city').value;
+            const addr = document.getElementById('co-address').value;
+            const payMethod = document.querySelector('input[name="pay"]:checked').value;
+
+            if (!name || !phone || !city || !addr) return alert('يرجى ملء كافة البيانات');
+
+            const total = cart.reduce((s, c) => s + (c.price * c.qty), 0);
+            const finalTotal = activeCoupon ? total - (total * (activeCoupon.discount_percent / 100)) : total;
+
+            try {
+                const { data: order, error } = await supabaseClient.from('orders').insert({
+                    customer_name: name,
+                    customer_phone: phone,
+                    city: city,
+                    address: addr,
+                    payment_method: payMethod,
+                    total_amount: finalTotal,
+                    status: 'pending'
+                }).select().single();
+                if (error) throw error;
+                alert('تم تقديم طلبك بنجاح! رقم الطلب: ' + order.id);
+                cart = []; updateCart(); toggleCart();
+            } catch (e) { alert('خطأ: ' + e.message); }
+        };
+
+        document.getElementById('contact-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const { error } = await supabaseClient.from('contact_messages').insert({
+                full_name: document.getElementById('con-name').value,
+                phone: document.getElementById('con-phone').value,
+                message: document.getElementById('con-msg').value
+            });
+            if (error) alert(error.message);
+            else { alert('تم الإرسال بنجاح! شكراً لتواصلك.'); e.target.reset(); }
+        };
+
+        // ══ CANDY RAIN LOGIC ══
+        function createCandy() {
+            const container = document.getElementById('candy-container');
+            const candies = ['🍬', '🍭', '🍫', '🍩', '🍪', '🍨'];
+            const candy = document.createElement('div');
+            candy.className = 'candy';
+            candy.innerText = candies[Math.floor(Math.random() * candies.length)];
+            candy.style.left = Math.random() * 100 + 'vw';
+            candy.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            container.appendChild(candy);
+
+            setTimeout(() => candy.remove(), 7000);
+        }
+        setInterval(createCandy, 500);
+
+        async function trackOrder() {
+            const id = document.getElementById('track-id').value;
+            const res = document.getElementById('track-result');
+            if (!id) return alert('يرجى إدخال رقم الطلب');
+
+            res.innerHTML = 'جاري البحث... 🔍';
+
+            const { data, error } = await supabaseClient.from('orders').select('status, total_amount').eq('id', id).single();
+
+            if (data) {
+                const statusMap = {
+                    'pending': 'قيد التنفيذ — طلبك يتم تجهيزه الآن بكل حب ⏳',
+                    'completed': 'تم التوصيل بنجاح — نتمنى أن تستمتع بمذاقنا الملكي ✅'
+                };
+                res.innerHTML = `
+                <div style="background: rgba(233, 30, 140, 0.05); padding: 1.5rem; border-radius: 15px;">
+                    حالة الطلب: <span style="color: var(--secondary);">${statusMap[data.status] || data.status}</span><br>
+                    <small style="opacity: 0.7;">إجمالي الفاتورة: ${data.total_amount} EGP</small>
+                </div>
+            `;
+            } else {
+                res.innerHTML = '<span style="color: red;">عذراً، لم نجد طلباً بهذا الرقم. يرجى التأكد من الرقم الصحيح.</span>';
+            }
+        }
+
+        let testimonialSwiper = null;
+        async function loadTestimonials() {
+            const { data } = await supabaseClient.from('testimonials').select('*').eq('is_approved', true).order('created_at', { ascending: false });
+            if (data) {
+                const grid = document.getElementById('testimonials-grid');
+                grid.innerHTML = data.map(t => `
+                <div class="swiper-slide">
+                    <div class="glass" style="padding: 3rem; border-radius: 40px; text-align: right; width: 100%; position: relative; transition: 0.5s; box-shadow: var(--shadow); height: 100%; display: flex; flex-direction: column;">
+                        <div style="position: absolute; top: -20px; right: 30px; background: var(--accent); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(255, 223, 64, 0.3);">
+                            <i data-lucide="quote" style="width: 20px; color: #fff;"></i>
+                        </div>
+                        <div style="color: var(--accent); margin-bottom: 1.5rem; display: flex; gap: 4px;">
+                            ${Array(parseInt(t.rating)).fill('<i data-lucide="star" style="width:16px; fill:var(--accent);"></i>').join('')}
+                        </div>
+                        <p style="font-style: italic; margin-bottom: 2rem; line-height: 2; color: var(--text-soft); font-size: 1.1rem; flex: 1;">"${t.comment}"</p>
+                        <div style="display: flex; align-items: center; gap: 15px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1.5rem;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; box-shadow: 0 10px 20px rgba(255, 90, 159, 0.2);">${t.name.charAt(0)}</div>
+                            <div>
+                                <strong style="color: var(--secondary); font-size: 1.1rem; display: block;">${t.name}</strong>
+                                <small style="opacity: 0.6;">عميل متميز</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+                lucide.createIcons();
+
+                if (testimonialSwiper) {
+                    testimonialSwiper.destroy();
+                }
+
+                testimonialSwiper = new Swiper('.testimonials-slider', {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                    breakpoints: {
+                        768: { slidesPerView: 2 },
+                        1024: { slidesPerView: 3 }
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                    loop: data.length > 3
+                });
+            }
+        }
+
+        function openReviewModal() { document.getElementById('review-overlay').style.display = 'flex'; }
+        function closeReviewModal() { document.getElementById('review-overlay').style.display = 'none'; }
+
+        async function submitReview() {
+            const name = document.getElementById('rev-name').value;
+            const rating = document.getElementById('rev-rating').value;
+            const comment = document.getElementById('rev-comment').value;
+
+            if (!name || !comment) return alert('يرجى كتابة الاسم والتعليق');
+
+            const { error } = await supabaseClient.from('testimonials').insert({ name, rating, comment });
+            if (error) alert(error.message);
+            else {
+                alert('شكراً لرأيك! سيظهر تقييمك فوراً.');
+                closeReviewModal();
+                loadTestimonials();
+            }
+        }
+
+        // Scroll Reveal & Nav Style
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
+            });
+        });
+
+        // ══ SPIN WHEEL LOGIC ══
+        const wheelCanvas = document.getElementById('wheel');
+        const ctx = wheelCanvas.getContext('2d');
+        const prizes = ["خصم 5%", "توصيل مجاني", "خصم 10%", "حظ أوفر", "هدية مفاجأة", "خصم 15%", "كوبون ملكي", "مرة أخرى"];
+        const colors = ["#FF5A9F", "#9B6DFF", "#FFDF40", "#7CDDFE", "#FF5A9F", "#9B6DFF", "#FFDF40", "#7CDDFE"];
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        function drawWheel() {
+            const arc = (2 * Math.PI) / prizes.length;
+            prizes.forEach((p, i) => {
+                const angle = i * arc;
+                ctx.fillStyle = colors[i];
+                ctx.beginPath();
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, angle, angle + arc);
+                ctx.fill();
+
+                ctx.save();
+                ctx.translate(150, 150);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 14px Cairo";
+                ctx.fillText(p, 130, 5);
+                ctx.restore();
+            });
+        }
+
+        function openWheel() { document.getElementById('wheel-overlay').style.display = 'flex'; drawWheel(); }
+        function closeWheel() { document.getElementById('wheel-overlay').style.display = 'none'; }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+            const spinBtn = document.getElementById('spin-btn');
+            spinBtn.disabled = true;
+
+            const spins = 5 + Math.random() * 5;
+            const extraDegree = Math.random() * 360;
+            const totalRotation = spins * 360 + extraDegree;
+
+            wheelCanvas.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.15, 1)';
+            wheelCanvas.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                const actualDeg = totalRotation % 360;
+                const prizeIdx = Math.floor(((360 - actualDeg + 90) % 360) / (360 / prizes.length));
+                const prize = prizes[prizeIdx];
+                document.getElementById('wheel-result').innerHTML = `مبروك! لقد ربحت: <br> <span style="font-size:2rem;">${prize}</span>`;
+                if (prize.includes('%')) alert('سيتم تطبيق الخصم عند الدفع!');
+                confettiEffect();
+            }, 4000);
+        }
+
+        function confettiEffect() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(createCandy, i * 50);
+            }
+        }
+
+        init();
+        lucide.createIcons();
+        drawWheel();
+    </script>
+
+</body>
+
+</html>
