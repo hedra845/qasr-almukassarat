@@ -868,24 +868,134 @@
         }
 
         @media (max-width: 768px) {
+            /* General */
+            section { padding: 4rem 5% !important; }
+            nav { padding: 0.8rem 5% !important; }
+            .logo { font-size: 1.5rem; }
+            .nav-links { display: none; }
+
+            /* Floating Elements */
+            .admin-link {
+                left: auto;
+                right: 20px;
+                bottom: 90px;
+                width: 50px;
+                height: 50px;
+            }
+            #wheel-trigger {
+                bottom: 90px;
+                left: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            #mascot-container {
+                left: 10px;
+                bottom: 10px;
+            }
+            .mascot-char { width: 80px; }
+            .speech-bubble {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+
+            /* Hero Section */
             #hero {
                 flex-direction: column;
                 text-align: center;
+                padding-top: 6rem !important;
+                gap: 2rem;
             }
-
+            .hero-text h1 { font-size: 2.5rem; }
+            .hero-text p { font-size: 1.1rem; }
+            .hero-text > div:last-child {
+                flex-direction: column;
+                justify-content: center;
+                gap: 1rem !important;
+            }
             .hero-visual {
+                width: 100%;
+                height: 350px;
+            }
+            .visual-container {
+                width: 280px;
+                height: 280px;
+            }
+            .hero-girl-img {
                 width: 300px;
                 height: 300px;
             }
-
-            .nav-links {
+            .hero-visual > div:not(.visual-container) {
                 display: none;
             }
 
-            .admin-link {
-                left: auto;
-                right: 30px;
-                bottom: 100px;
+            /* Features */
+            .feature-card {
+                padding: 2.5rem 1.5rem;
+            }
+
+            /* About Section */
+            #about > div {
+                grid-template-columns: 1fr !important;
+                text-align: center;
+                gap: 3rem !important;
+            }
+            #about h2 { font-size: 2.5rem !important; }
+            #about > div > div:first-child > div:last-child {
+                justify-content: center;
+            }
+
+            /* Products */
+            #products h2 { font-size: 2.5rem !important; }
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            /* Contact Form Section */
+            #contact-form-section > div {
+                grid-template-columns: 1fr !important;
+                border-radius: 30px !important;
+            }
+            #contact-form-section > div > div {
+                padding: 2rem !important;
+            }
+            #contact-form-section h2 { font-size: 2rem !important; }
+            #contact-form > div:first-child {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Track Order */
+            #track-order .glass {
+                padding: 2rem 1rem !important;
+                border-radius: 30px !important;
+            }
+            #track-order h2 { font-size: 2rem !important; }
+            #track-order > div > div > input {
+                min-width: 100% !important;
+            }
+
+            /* Overlays & Modals */
+            .cart-panel, .wheel-container, #review-overlay .glass {
+                padding: 1.5rem !important;
+                width: 95% !important;
+                margin: 0 auto;
+            }
+            .wheel-canvas-container {
+                width: 250px !important;
+                height: 250px !important;
+            }
+            canvas#wheel {
+                width: 100%;
+                height: 100%;
+            }
+
+            /* Footer */
+            footer {
+                padding: 3rem 5% 2rem !important;
+                text-align: center;
+            }
+            footer > div:first-child {
+                gap: 2.5rem !important;
             }
         }
 
