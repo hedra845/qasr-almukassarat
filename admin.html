@@ -67,6 +67,30 @@
             table { display: block; overflow-x: auto; white-space: nowrap; }
             #login-screen > div > div { padding: 2rem !important; margin: 1rem; }
         }
+        .stat-card {
+            padding: 2rem;
+            border-radius: 24px;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        }
+        .stat-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            opacity: 0.9;
+            font-weight: 700;
+            margin-top: 0;
+        }
+        .stat-card h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -132,6 +156,8 @@
 
     let activeTab = 'orders';
     let categories = [], products = [], orders = [], coupons = [], messages = [], bestSellers = [];
+    let orderSearchQuery = '';
+    let orderStatusFilter = 'all';
 
     document.getElementById('login-btn').onclick = async () => {
         const btn = document.getElementById('login-btn');
@@ -196,7 +222,44 @@
     function renderTab() {
         const container = document.getElementById('tab-content');
         if (activeTab === 'orders') {
-            container.innerHTML = `<h2>📦 الطلبات (${orders.length})</h2>` + orders.map(o => {
+            // Apply filtering in memory
+            let filteredOrders = orders.filter(o => {
+                const matchesSearch = !orderSearchQuery ? true : (
+                    o.customer_name.toLowerCase().includes(orderSearchQuery.toLowerCase()) || 
+                    o.customer_phone.includes(orderSearchQuery) ||
+                    (o.id && String(o.id).includes(orderSearchQuery))
+                );
+                const matchesStatus = orderStatusFilter === 'all' ? true : o.status === orderStatusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:2rem;">
+                    <h2>📦 إدارة الطلبات (${filteredOrders.length})</h2>
+                    <button class="admin-btn" onclick="exportOrdersToCSV()" style="margin: 0; padding: 0.7rem 1.2rem; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: 700; background: #e8f9f0; color: #28a745; border: 1px solid #28a745; cursor:pointer;">
+                        📥 تصدير الطلبات كـ CSV
+                    </button>
+                </div>
+                
+                <div style="display:flex; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; background:#fff; padding:1.2rem; border-radius:20px; box-shadow: var(--shadow);">
+                    <input type="text" placeholder="🔍 ابحث باسم العميل، الهاتف، أو رقم الطلب..." 
+                        value="${orderSearchQuery}" 
+                        oninput="orderSearchQuery = this.value; renderTab();" 
+                        style="flex:2; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; min-width: 250px;">
+                    
+                    <select onchange="orderStatusFilter = this.value; renderTab();" 
+                        style="flex:1; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; background:#fff; min-width: 150px;">
+                        <option value="all" ${orderStatusFilter === 'all' ? 'selected' : ''}>📌 كل الحالات</option>
+                        <option value="pending" ${orderStatusFilter === 'pending' ? 'selected' : ''}>⏳ قيد التنفيذ</option>
+                        <option value="completed" ${orderStatusFilter === 'completed' ? 'selected' : ''}>✅ تم التوصيل</option>
+                    </select>
+                </div>
+            ` + (filteredOrders.length === 0 ? `
+                <div style="text-align:center; padding:4rem; color:var(--text-soft); background:#fff; border-radius:24px; box-shadow:var(--shadow);">
+                    <p style="font-size:1.2rem; font-weight:700; margin-bottom:0.5rem;">لا توجد طلبات تطابق معايير البحث!</p>
+                    <p style="font-size:0.9rem;">تأكد من إدخال الاسم أو رقم الهاتف بشكل صحيح، أو تغيير حالة التصفية.</p>
+                </div>
+            ` : filteredOrders.map(o => {
                 const date = o.created_at ? new Date(o.created_at).toLocaleString('ar-EG', {
                     year: 'numeric',
                     month: 'long',
@@ -208,7 +271,7 @@
 
                 const payMethodLabel = o.payment_method === 'instapay' ? '💳 انستاباي (Instapay)' : '💵 الدفع عند الاستلام';
 
-                const addressParts = o.address ? o.address.split(' || المنتجات: ') : ['غير محدد', ''];
+                const addressParts = o.address ? o.address.split(' || المنتجات: ') : ['غير حدد', ''];
                 const addressOnly = addressParts[0];
                 const productsList = addressParts[1] || 'غير متوفرة (طلب قديم)';
 
@@ -232,7 +295,7 @@
                             <p style="margin-bottom:0.4rem;"><strong>💳 طريقة الدفع:</strong> ${payMethodLabel}</p>
                         </div>
                         <div>
-                            <p style="margin-bottom:0.4rem;"><strong>📍 المدينة:</strong> ${o.city || 'غير مححدد'}</p>
+                            <p style="margin-bottom:0.4rem;"><strong>📍 المدينة:</strong> ${o.city || 'غير محدد'}</p>
                             <p style="margin-bottom:0.4rem;"><strong>🏠 العنوان بالتفصيل:</strong> ${addressOnly}</p>
                             <div style="display:flex; align-items:center; gap:8px; margin-top:0.8rem;">
                                 <strong>⚙️ حالة الطلب:</strong>
@@ -253,7 +316,7 @@
                     </div>
                 </div>
                 `;
-            }).join('');
+            }).join(''));
         } else if (activeTab === 'products') {
             container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🥜 المنتجات</h2><button class="admin-btn" onclick="showProductModal()">+ إضافة منتج</button></div>
             <table><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>التحكم</th></tr>` + products.map(p => `
@@ -306,12 +369,64 @@
             }).join('') + `</table>`;
         } else if (activeTab === 'reports') {
             const rev = orders.reduce((s,o)=>s+(o.total_amount||0), 0);
-            container.innerHTML = `<h2>📊 التقارير</h2>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
-                    <div style="background:#fff; padding:2rem; border-radius:15px; text-align:center;"><h3>إجمالي المبيعات</h3><h2 style="color:var(--primary);">${rev} EGP</h2></div>
-                    <div style="background:#fff; padding:2rem; border-radius:15px; text-align:center;"><h3>عدد الطلبات</h3><h2 style="color:var(--primary);">${orders.length}</h2></div>
-                </div>`;
+            container.innerHTML = `
+                <h2>📊 لوحة التقارير والتحليلات الإحصائية</h2>
+                <p style="color:var(--text-soft); font-weight:600; margin-bottom:2rem;">راقب نمو متجرك الملكي وتفاصيل مبيعاتك اليومية في الوقت الفعلي</p>
+                
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.5rem; margin-top:1.5rem;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">
+                        <h3>💰 إجمالي المبيعات</h3>
+                        <h2>${rev} EGP</h2>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                        <h3>📦 عدد الطلبات</h3>
+                        <h2>${orders.length} طلب</h2>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                        <h3>✅ طلبات تم توصيلها</h3>
+                        <h2>${orders.filter(o => o.status === 'completed').length} طلب</h2>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%);">
+                        <h3>⏳ طلبات قيد التنفيذ</h3>
+                        <h2>${orders.filter(o => o.status === 'pending').length} طلب</h2>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);">
+                        <h3>📈 متوسط قيمة الطلب (AOV)</h3>
+                        <h2>${(rev / (orders.length || 1)).toFixed(1)} EGP</h2>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #fda085 0%, #f6d365 100%);">
+                        <h3>🥜 إجمالي الأصناف والمنتجات</h3>
+                        <h2>${products.length} صنف</h2>
+                    </div>
+                </div>
+            `;
         }
+    }
+
+    function exportOrdersToCSV() {
+        if (orders.length === 0) return alert('لا توجد طلبات لتصديرها!');
+        
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // UTF-8 BOM for Arabic text
+        csvContent += "رقم الطلب,العميل,الهاتف,المدينة,العنوان بالتفصيل,طريقة الدفع,القيمة الإجمالية,الحالة,التاريخ\n";
+        
+        orders.forEach(o => {
+            const addressParts = o.address ? o.address.split(' || المنتجات: ') : ['غير محدد', ''];
+            const addressOnly = addressParts[0].replace(/,/g, ' ');
+            const productsList = (addressParts[1] || 'غير متوفرة').replace(/,/g, ' - ');
+            const payLabel = o.payment_method === 'instapay' ? 'انستاباي' : 'الدفع عند الاستلام';
+            const statusLabel = o.status === 'completed' ? 'تم التوصيل' : 'قيد التنفيذ';
+            const date = o.created_at ? new Date(o.created_at).toLocaleDateString('ar-EG') : 'غير معروف';
+            
+            csvContent += `${o.id},"${o.customer_name}","${o.customer_phone}","${o.city}","${addressOnly} | المنتجات: ${productsList}","${payLabel}",${o.total_amount},"${statusLabel}","${date}"\n`;
+        });
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `طلبات_قصر_المكسرات_${new Date().toLocaleDateString('en-US')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     function openModal(html) { document.getElementById('modal-body').innerHTML = html; document.getElementById('admin-modal').style.display = 'flex'; }
