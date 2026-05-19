@@ -663,6 +663,25 @@
             border-color: transparent;
         }
 
+        #best-sellers-grid {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 1.5rem 0.5rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            justify-content: center;
+        }
+
+        @media (max-width: 1024px) {
+            #best-sellers-grid {
+                justify-content: flex-start !important;
+            }
+        }
+
         /* Cart Overlay */
         #cart-overlay {
             position: fixed;
@@ -1313,7 +1332,7 @@
         </div>
         <!-- Slider Container -->
         <div id="best-sellers-slider-wrapper" style="overflow: hidden; width: 100%;">
-            <div id="best-sellers-grid" style="display: flex; gap: 2rem; overflow-x: auto; scroll-behavior: smooth; padding: 1.5rem 0.5rem; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none;">
+            <div id="best-sellers-grid">
                 <!-- Cards injected here -->
             </div>
         </div>
