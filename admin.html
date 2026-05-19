@@ -369,8 +369,58 @@
             }).join('') + `</table>`;
         } else if (activeTab === 'reports') {
             const rev = orders.reduce((s,o)=>s+(o.total_amount||0), 0);
+
+            // 💳 Payment stats
+            let payStats = { instapay: { count: 0, rev: 0 }, cod: { count: 0, rev: 0 } };
+            orders.forEach(o => {
+                const method = o.payment_method === 'instapay' ? 'instapay' : 'cod';
+                payStats[method].count++;
+                payStats[method].rev += parseFloat(o.total_amount) || 0;
+            });
+            const totalPayCount = payStats.instapay.count + payStats.cod.count || 1;
+            const instapayPercent = ((payStats.instapay.count / totalPayCount) * 100).toFixed(0);
+            const codPercent = ((payStats.cod.count / totalPayCount) * 100).toFixed(0);
+
+            // 📍 City breakdown
+            let citySales = {};
+            orders.forEach(o => {
+                const city = o.city ? o.city.trim() : 'غير محدد';
+                if (!citySales[city]) {
+                    citySales[city] = { count: 0, revenue: 0 };
+                }
+                citySales[city].count++;
+                citySales[city].revenue += parseFloat(o.total_amount) || 0;
+            });
+            const topCities = Object.entries(citySales)
+                .sort((a, b) => b[1].revenue - a[1].revenue);
+
+            // 🥜 Actual top-selling products parsing
+            let productSales = {};
+            orders.forEach(o => {
+                const parts = o.address ? o.address.split(' || المنتجات: ') : ['', ''];
+                const prodStr = parts[1] || '';
+                if (prodStr) {
+                    const items = prodStr.split(' - ');
+                    items.forEach(item => {
+                        const cleanItem = item.replace('•', '').trim();
+                        if (!cleanItem) return;
+                        
+                        const qtyMatch = cleanItem.match(/x(\d+)/);
+                        const qty = qtyMatch ? parseInt(qtyMatch[1]) : 1;
+                        
+                        const nameOnly = cleanItem.replace(/x\d+/, '').trim();
+                        if (nameOnly) {
+                            productSales[nameOnly] = (productSales[nameOnly] || 0) + qty;
+                        }
+                    });
+                }
+            });
+            const topProducts = Object.entries(productSales)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
             container.innerHTML = `
-                <h2>📊 لوحة التقارير والتحليلات الإحصائية</h2>
+                <h2>📊 لوحة التقارير والتحليلات الإحصائية الذكية</h2>
                 <p style="color:var(--text-soft); font-weight:600; margin-bottom:2rem;">راقب نمو متجرك الملكي وتفاصيل مبيعاتك اليومية في الوقت الفعلي</p>
                 
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.5rem; margin-top:1.5rem;">
@@ -397,6 +447,70 @@
                     <div class="stat-card" style="background: linear-gradient(135deg, #fda085 0%, #f6d365 100%);">
                         <h3>🥜 إجمالي الأصناف والمنتجات</h3>
                         <h2>${products.length} صنف</h2>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:2rem; margin-top:3rem;">
+                    <!-- 📦 تحليل المبيعات الجغرافي وطرق الدفع -->
+                    <div style="background:#fff; padding:2rem; border-radius:24px; box-shadow:var(--shadow);">
+                        <h3 style="color:var(--secondary); font-weight:800; border-bottom:1.5px solid #f0f0f0; padding-bottom:0.8rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:8px;">
+                            📊 تحليل الدفع والتوزيع الجغرافي
+                        </h3>
+                        
+                        <!-- 💳 طرق الدفع -->
+                        <h4 style="margin-bottom:0.8rem; color:#555; font-size:0.9rem;">💳 طرق الدفع المفضلة:</h4>
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:700; margin-bottom:0.4rem;">
+                            <span style="color:#a18cd1;">انستاباي (${instapayPercent}%)</span>
+                            <span style="color:#ff9a9e;">الدفع عند الاستلام (${codPercent}%)</span>
+                        </div>
+                        <div style="height:12px; background:#f0f0f0; border-radius:10px; display:flex; overflow:hidden; margin-bottom:2.5rem;">
+                            <div style="width:${instapayPercent}%; background:linear-gradient(90deg, #a18cd1, #fbc2eb);"></div>
+                            <div style="width:${codPercent}%; background:linear-gradient(90deg, #ff9a9e, #fecfef);"></div>
+                        </div>
+
+                        <!-- 📍 توزيع المدن -->
+                        <h4 style="margin-bottom:1rem; color:#555; font-size:0.9rem;">📍 المحافظات الأكثر طلباً:</h4>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            ${topCities.slice(0, 4).map(([city, data]) => {
+                                const percent = ((data.revenue / (rev || 1)) * 100).toFixed(0);
+                                return `
+                                    <div>
+                                        <div style="display:flex; justify-content:space-between; font-size:0.9rem; font-weight:700; margin-bottom:4px;">
+                                            <span>${city}</span>
+                                            <span style="color:var(--primary);">${data.revenue} EGP (${data.count} طلب)</span>
+                                        </div>
+                                        <div style="height:8px; background:#f0f0f0; border-radius:10px; overflow:hidden;">
+                                            <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, var(--primary), var(--secondary)); border-radius:10px;"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- 🥜 المنتجات الأكثر طلباً فعلياً -->
+                    <div style="background:#fff; padding:2rem; border-radius:24px; box-shadow:var(--shadow);">
+                        <h3 style="color:var(--secondary); font-weight:800; border-bottom:1.5px solid #f0f0f0; padding-bottom:0.8rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:8px;">
+                            🔥 المنتجات الأكثر مبيعاً (من المبيعات الفعلية)
+                        </h3>
+                        
+                        <div style="display:flex; flex-direction:column; gap:1.2rem;">
+                            ${topProducts.length === 0 ? `
+                                <p style="text-align:center; color:#999; padding:2rem;">لا توجد بيانات مبيعات كافية لعرض المنتجات الأكثر طلباً.</p>
+                            ` : topProducts.map(([name, qty], index) => {
+                                return `
+                                    <div style="display:flex; align-items:center; gap:15px; background:rgba(255, 90, 159, 0.02); padding:1rem; border-radius:18px; border:1px solid rgba(0,0,0,0.02);">
+                                        <span style="background:var(--primary); color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.9rem;">
+                                            ${index + 1}
+                                        </span>
+                                        <div style="flex:1;">
+                                            <strong style="color:#333; font-size:0.95rem;">${name}</strong>
+                                            <div style="color:var(--text-soft); font-size:0.85rem; margin-top:2px;">إجمالي المبيعات: ${qty} قطعة/وزن</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
                 </div>
             `;
