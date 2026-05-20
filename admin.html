@@ -98,8 +98,8 @@
 <div id="login-screen">
     <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
         <div style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 4rem; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; text-align: center; border: 1px solid rgba(255,255,255,0.3);">
-            <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); width: 80px; height: 80px; border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; color: #fff; box-shadow: 0 10px 20px rgba(155, 109, 255, 0.3);">
-                <span style="font-size: 2.5rem;">🏰</span>
+            <div style="margin: 0 auto 2rem; text-align: center;">
+                <img src="logo.png" alt="شعار قصر المكسرات" style="max-height: 100px; width: auto; object-fit: contain;">
             </div>
             <h2 style="margin-bottom: 0.5rem; font-weight: 900; color: var(--secondary);">مرحباً بك مجدداً</h2>
             <p style="color: var(--text-soft); margin-bottom: 2.5rem; font-size: 0.95rem;">سجل دخولك لإدارة قصر المكسرات</p>
@@ -124,7 +124,10 @@
 
 <div id="dashboard" style="display: none;">
     <nav class="admin-nav">
-        <h3 style="font-weight: 900; color: var(--secondary);">🏰 قصر المكسرات</h3>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="logo.png" alt="شعار المتجر" style="height: 45px; width: auto; object-fit: contain;">
+            <h3 style="font-weight: 900; color: var(--secondary); margin: 0;">قصر المكسرات</h3>
+        </div>
         <button class="admin-btn secondary" onclick="logout()">خروج</button>
     </nav>
 
@@ -137,6 +140,7 @@
             <li onclick="switchTab('cats')" id="btn-cats">📁 الأقسام</li>
             <li onclick="switchTab('coupons')" id="btn-coupons">🎟️ الكوبونات</li>
             <li onclick="switchTab('messages')" id="btn-messages">✉️ الرسائل</li>
+            <li onclick="switchTab('shipping')" id="btn-shipping">🚚 مناطق الشحن</li>
             <li onclick="switchTab('settings')" id="btn-settings">⚙️ إعدادات المتجر</li>
         </ul>
     </div>
@@ -156,7 +160,7 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let activeTab = 'orders';
-    let categories = [], products = [], orders = [], coupons = [], messages = [], bestSellers = [];
+    let categories = [], products = [], orders = [], coupons = [], messages = [], bestSellers = [], shippingZones = [];
     let storeSettings = {};
     let orderSearchQuery = '';
     let orderStatusFilter = 'all';
@@ -212,6 +216,7 @@
             const p = products.find(x => x.id === item.product_id);
             return { ...item, products: p };
         });
+        const { data: sz } = await supabaseClient.from('shipping_zones').select('*'); shippingZones = sz || [];
         const { data: st } = await supabaseClient.from('store_settings').select('*');
         if (st) {
             st.forEach(s => storeSettings[s.key] = s.value);
@@ -530,6 +535,18 @@
                     </div>
                 </div>
             `;
+        } else if (activeTab === 'shipping') {
+            container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🚚 مناطق الشحن</h2><button class="admin-btn" onclick="showShippingModal()">+ إضافة منطقة</button></div>
+            <table><tr><th>المنطقة/المدينة</th><th>تكلفة الشحن</th><th>التحكم</th></tr>` + shippingZones.map(s => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.cost} EGP</td>
+                    <td>
+                        <button onclick="showShippingModal(${s.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
+                        <button onclick="deleteItem('shipping_zones', ${s.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
+                    </td>
+                </tr>
+            `).join('') + `</table>`;
         } else if (activeTab === 'settings') {
             container.innerHTML = `
                 <h2>⚙️ إعدادات المتجر ومعلومات التواصل</h2>
@@ -584,6 +601,36 @@
         } else {
             alert('تم حفظ الإعدادات بنجاح!');
             loadData();
+        }
+    }
+
+    function showShippingModal(id = null) {
+        const s = id ? shippingZones.find(x => x.id === id) : { name: '', cost: '' };
+        openModal(`
+            <h3>${id ? 'تعديل منطقة شحن' : 'إضافة منطقة شحن'}</h3>
+            <input id="m-sz-name" value="${s.name}" placeholder="المدينة/المنطقة (مثال: القاهرة)">
+            <input type="number" id="m-sz-cost" value="${s.cost}" placeholder="تكلفة الشحن (مثال: 50)">
+            <button class="admin-btn" onclick="saveShipping(${id})">حفظ</button>
+            <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
+        `);
+    }
+
+    async function saveShipping(id) {
+        const name = document.getElementById('m-sz-name').value;
+        const cost = document.getElementById('m-sz-cost').value;
+        if (!name || cost === '') return alert('يرجى إدخال اسم المنطقة وتكلفة الشحن');
+        
+        const data = { name, cost: parseFloat(cost) };
+        let res;
+        if (id) {
+            res = await supabaseClient.from('shipping_zones').update(data).eq('id', id);
+        } else {
+            res = await supabaseClient.from('shipping_zones').insert(data);
+        }
+        if (res.error) {
+            alert('خطأ في حفظ المنطقة: ' + res.error.message);
+        } else {
+            closeModal(); loadData();
         }
     }
 
