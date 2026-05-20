@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary: #FF5A9F; --secondary: #9B6DFF; --accent: #FFDF40;
+            --primary: #9B6DFF; --secondary: #FF5A9F; --accent: #FFDF40;
             --bg: #F5FEFF; --white: #ffffff; --text: #2d1a2e; --text-soft: #5a3e52;
             --shadow: 0 10px 30px rgba(155, 109, 255, 0.1);
         }
@@ -164,6 +164,9 @@
     let storeSettings = {};
     let orderSearchQuery = '';
     let orderStatusFilter = 'all';
+    let orderStartDate = '';
+    let orderEndDate = '';
+    let currentFilteredOrders = [];
 
     document.getElementById('login-btn').onclick = async () => {
         const btn = document.getElementById('login-btn');
@@ -248,8 +251,17 @@
                     (o.id && String(o.id).includes(orderSearchQuery))
                 );
                 const matchesStatus = orderStatusFilter === 'all' ? true : o.status === orderStatusFilter;
-                return matchesSearch && matchesStatus;
+                
+                let matchesDate = true;
+                if (o.created_at) {
+                    const orderDate = new Date(o.created_at).toISOString().split('T')[0];
+                    if (orderStartDate && orderDate < orderStartDate) matchesDate = false;
+                    if (orderEndDate && orderDate > orderEndDate) matchesDate = false;
+                }
+                
+                return matchesSearch && matchesStatus && matchesDate;
             });
+            currentFilteredOrders = filteredOrders;
 
             container.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:2rem;">
@@ -271,6 +283,9 @@
                         <option value="pending" ${orderStatusFilter === 'pending' ? 'selected' : ''}>⏳ قيد التنفيذ</option>
                         <option value="completed" ${orderStatusFilter === 'completed' ? 'selected' : ''}>✅ تم التوصيل</option>
                     </select>
+
+                    <input type="date" value="${orderStartDate}" onchange="orderStartDate = this.value; renderTab();" style="flex:1; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; min-width: 130px;" title="من تاريخ">
+                    <input type="date" value="${orderEndDate}" onchange="orderEndDate = this.value; renderTab();" style="flex:1; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; min-width: 130px;" title="إلى تاريخ">
                 </div>
             ` + (filteredOrders.length === 0 ? `
                 <div style="text-align:center; padding:4rem; color:var(--text-soft); background:#fff; border-radius:24px; box-shadow:var(--shadow);">
@@ -315,12 +330,13 @@
                         <div>
                             <p style="margin-bottom:0.4rem;"><strong>📍 المدينة:</strong> ${o.city || 'غير محدد'}</p>
                             <p style="margin-bottom:0.4rem;"><strong>🏠 العنوان بالتفصيل:</strong> ${addressOnly}</p>
-                            <div style="display:flex; align-items:center; gap:8px; margin-top:0.8rem;">
+                            <div style="display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:0.8rem;">
                                 <strong>⚙️ حالة الطلب:</strong>
                                 <select onchange="updateStatus(${o.id}, this.value)" style="width:auto; margin-bottom:0; padding:0.4rem 1rem; border-radius:10px; font-size:0.85rem; background:#fff0f6; border-color:var(--primary);">
                                     <option value="pending" ${o.status==='pending'?'selected':''}>قيد التنفيذ ⏳</option>
                                     <option value="completed" ${o.status==='completed'?'selected':''}>تم التوصيل ✅</option>
                                 </select>
+                                <button onclick="deleteItem('orders', ${o.id})" style="background:#fff0f6; color:#ff4d4d; border:1px solid #ffccdf; padding:0.4rem 1rem; border-radius:10px; cursor:pointer; font-weight:bold; font-family:inherit; transition:0.3s; font-size:0.85rem;" onmouseover="this.style.background='#ffd6e6'" onmouseout="this.style.background='#fff0f6'">🗑️ حذف الطلب</button>
                             </div>
                         </div>
                     </div>
@@ -635,12 +651,15 @@
     }
 
     function exportOrdersToCSV() {
-        if (orders.length === 0) return alert('لا توجد طلبات لتصديرها!');
+        if (!currentFilteredOrders || currentFilteredOrders.length === 0) {
+            if (orders.length === 0) return alert('لا توجد طلبات لتصديرها!');
+            return alert('لا توجد طلبات تطابق الفلتر لتصديرها!');
+        }
         
         let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // UTF-8 BOM for Arabic text
         csvContent += "رقم الطلب,العميل,الهاتف,المدينة,العنوان بالتفصيل,طريقة الدفع,القيمة الإجمالية,الحالة,التاريخ\n";
         
-        orders.forEach(o => {
+        currentFilteredOrders.forEach(o => {
             const addressParts = o.address ? o.address.split(' || المنتجات: ') : ['غير محدد', ''];
             const addressOnly = addressParts[0].replace(/,/g, ' ');
             const productsList = (addressParts[1] || 'غير متوفرة').replace(/,/g, ' - ');
