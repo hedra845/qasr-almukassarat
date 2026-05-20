@@ -85,3 +85,19 @@ INSERT INTO categories (name, slug, emoji) VALUES
 INSERT INTO products (category_id, (SELECT id FROM categories WHERE slug = 'nuts'), 'مكسرات مشكلة فاخرة', 149, NULL, '500g', '🥜', 'hot', 5, 234);
 -- Note: Fixed the insert to use proper relations if needed, but for simplicity:
 -- This is just a schema template.
+
+-- 7. Store Settings Table
+CREATE TABLE store_settings (
+    id SERIAL PRIMARY KEY,
+    key VARCHAR(100) UNIQUE NOT NULL,
+    value TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert Default Settings
+INSERT INTO store_settings (key, value) VALUES 
+('phone', '01551407492'),
+('address', 'القاهرة، مصر'),
+('facebook', ''),
+('instagram', ''),
+('tiktok', '');

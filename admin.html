@@ -137,6 +137,7 @@
             <li onclick="switchTab('cats')" id="btn-cats">📁 الأقسام</li>
             <li onclick="switchTab('coupons')" id="btn-coupons">🎟️ الكوبونات</li>
             <li onclick="switchTab('messages')" id="btn-messages">✉️ الرسائل</li>
+            <li onclick="switchTab('settings')" id="btn-settings">⚙️ إعدادات المتجر</li>
         </ul>
     </div>
 
@@ -156,6 +157,7 @@
 
     let activeTab = 'orders';
     let categories = [], products = [], orders = [], coupons = [], messages = [], bestSellers = [];
+    let storeSettings = {};
     let orderSearchQuery = '';
     let orderStatusFilter = 'all';
 
@@ -210,6 +212,10 @@
             const p = products.find(x => x.id === item.product_id);
             return { ...item, products: p };
         });
+        const { data: st } = await supabaseClient.from('store_settings').select('*');
+        if (st) {
+            st.forEach(s => storeSettings[s.key] = s.value);
+        }
         renderTab();
     }
 
@@ -524,6 +530,60 @@
                     </div>
                 </div>
             `;
+        } else if (activeTab === 'settings') {
+            container.innerHTML = `
+                <h2>⚙️ إعدادات المتجر ومعلومات التواصل</h2>
+                <div style="background:#fff; padding:2rem; border-radius:15px; margin-top:2rem; max-width: 600px; box-shadow: var(--shadow);">
+                    <label style="font-weight:700; display:block; margin-bottom:0.5rem;">📍 العنوان</label>
+                    <input id="set-address" value="${storeSettings.address || ''}" placeholder="القاهرة، مصر">
+                    
+                    <label style="font-weight:700; display:block; margin-bottom:0.5rem;">📞 رقم الهاتف</label>
+                    <input id="set-phone" value="${storeSettings.phone || ''}" placeholder="01551407492">
+                    
+                    <label style="font-weight:700; display:block; margin-bottom:0.5rem;">📘 رابط فيسبوك</label>
+                    <input id="set-facebook" value="${storeSettings.facebook || ''}" placeholder="https://facebook.com/...">
+                    
+                    <label style="font-weight:700; display:block; margin-bottom:0.5rem;">📸 رابط انستجرام</label>
+                    <input id="set-instagram" value="${storeSettings.instagram || ''}" placeholder="https://instagram.com/...">
+                    
+                    <label style="font-weight:700; display:block; margin-bottom:0.5rem;">🎵 رابط تيك توك</label>
+                    <input id="set-tiktok" value="${storeSettings.tiktok || ''}" placeholder="https://tiktok.com/...">
+
+                    <button class="admin-btn" onclick="saveSettings()" style="width:100%; font-size:1.1rem; padding:1rem; border-radius:12px; margin-top:1rem;">حفظ الإعدادات</button>
+                </div>
+            `;
+        }
+    }
+
+    async function saveSettings() {
+        const keys = ['address', 'phone', 'facebook', 'instagram', 'tiktok'];
+        let hasError = false;
+        let lastError = '';
+        
+        for (let key of keys) {
+            const val = document.getElementById('set-' + key).value;
+            const { data, error: selectErr } = await supabaseClient.from('store_settings').select('id').eq('key', key);
+            
+            if (selectErr) {
+                hasError = true;
+                lastError = selectErr.message;
+                break;
+            }
+            
+            if (data && data.length > 0) {
+                const { error: updateErr } = await supabaseClient.from('store_settings').update({ value: val }).eq('key', key);
+                if (updateErr) { hasError = true; lastError = updateErr.message; break; }
+            } else {
+                const { error: insertErr } = await supabaseClient.from('store_settings').insert({ key: key, value: val });
+                if (insertErr) { hasError = true; lastError = insertErr.message; break; }
+            }
+        }
+        
+        if (hasError) {
+            alert('خطأ في حفظ الإعدادات: ' + lastError + '\n\nتأكد من إنشاء جدول store_settings في قاعدة البيانات.');
+        } else {
+            alert('تم حفظ الإعدادات بنجاح!');
+            loadData();
         }
     }
 
