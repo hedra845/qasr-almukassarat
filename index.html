@@ -718,79 +718,147 @@
 
         /* Best Sellers Premium Styles */
         .best-seller-card {
-            border: 2px solid rgba(255, 90, 159, 0.15) !important;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 245, 0.95)) !important;
-            box-shadow: 0 15px 35px rgba(255, 90, 159, 0.08) !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
         }
-        
+
         .best-seller-card:hover {
-            border-color: var(--primary) !important;
-            box-shadow: 0 25px 45px rgba(255, 90, 159, 0.18) !important;
-            transform: translateY(-12px) !important;
+            transform: translateY(-8px) !important;
+        }
+
+        .best-seller-card .card-img {
+            width: 100%;
+            height: 310px;
+            border-radius: 20px;
+            margin-bottom: 1.2rem;
+            position: relative;
+            background: transparent;
+            box-shadow: none;
+            border: none;
+        }
+
+        .best-seller-card .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
         }
 
         .best-seller-badge {
             position: absolute;
             top: 15px;
             left: 15px;
-            background: linear-gradient(135deg, #FFDF40, #FF5A9F);
-            background-size: 200% 200%;
-            animation: gradientMove 3s ease infinite;
-            color: #fff;
-            padding: 6px 14px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 0.75rem;
+            background: #fff;
+            color: var(--secondary);
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
             z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 6px 15px rgba(255, 90, 159, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .best-seller-card h3 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 0.2rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .best-seller-card .subtitle {
+            font-size: 0.75rem;
+            color: #999;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            text-align: center;
+        }
+
+        .best-seller-card .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--secondary);
+            text-align: center;
+        }
+
+        .best-seller-card .add-btn-outline {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--secondary);
+            border-radius: 50px;
+            background: transparent;
+            color: var(--secondary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-family: inherit;
+            margin-top: 1rem;
+        }
+
+        .best-seller-card .add-btn-outline:hover {
+            background: var(--secondary);
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(155, 109, 255, 0.2);
         }
 
         .slider-arrow {
             background: #fff;
-            border: 1px solid rgba(155, 109, 255, 0.15);
-            width: 50px;
-            height: 50px;
+            border: none;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             color: var(--secondary);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 8px 20px rgba(155, 109, 255, 0.05);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .slider-arrow:hover {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #fff;
-            transform: scale(1.1);
-            box-shadow: 0 10px 25px rgba(255, 90, 159, 0.3);
-            border-color: transparent;
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(255, 90, 159, 0.25);
         }
 
         #best-sellers-grid {
             display: flex;
-            gap: 2rem;
+            gap: 1.8rem;
             overflow-x: auto;
             scroll-behavior: smooth;
-            padding: 1.5rem 0.5rem;
+            padding: 1.5rem 0.5rem 2rem;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             -ms-overflow-style: none;
+        }
+
+        .bs-page-indicator {
+            display: flex;
+            align-items: center;
             justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        .bs-page-indicator .current-page {
+            color: var(--secondary);
+            font-weight: 800;
         }
 
         @media (max-width: 1024px) {
@@ -1535,21 +1603,19 @@
     </section>
 
     <!-- ══ BEST SELLERS SECTION ══ -->
-    <section id="best-sellers-section" class="reveal" style="padding: 4rem 8% 2rem; display: none; background: linear-gradient(180deg, rgba(255, 90, 159, 0.03) 0%, rgba(155, 109, 255, 0.03) 100%); border-bottom: 1px solid rgba(0,0,0,0.03);">
-        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 2.5rem; gap: 1.5rem;">
-            <div>
-                <span style="background: rgba(255, 90, 159, 0.1); color: var(--primary); padding: 6px 15px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0.5rem;">
-                    🔥 اختيار عملائنا المفضل
-                </span>
-                <h2 style="font-size: 2.8rem; font-weight: 900; color: var(--secondary); margin: 0;">الأكثر <em>مبيعاً</em></h2>
-            </div>
+    <section id="best-sellers-section" class="reveal" style="padding: 4rem 8% 3rem; display: none; background: linear-gradient(180deg, rgba(215, 190, 255, 0.15) 0%, rgba(255, 200, 220, 0.1) 50%, rgba(255,255,255,0) 100%);">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 2rem; gap: 1rem;">
+            <span style="background: linear-gradient(135deg, rgba(255, 90, 159, 0.12), rgba(155, 109, 255, 0.12)); color: var(--primary); padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 90, 159, 0.1);">
+                🔥 اختيار عملائنا المفضل
+            </span>
+            <h2 style="font-size: 3rem; font-weight: 900; color: var(--secondary); margin: 0; line-height: 1.2;">الأكثر <em>مبيعاً</em></h2>
             <!-- Slider Controls -->
-            <div style="display: flex; gap: 1rem; justify-content: center;">
+            <div style="display: flex; gap: 0.8rem; justify-content: center; margin-top: 0.5rem;">
                 <button onclick="slideBestSellers('right')" aria-label="السابق" class="slider-arrow">
-                    <i data-lucide="chevron-right" style="width: 24px; height: 24px;"></i>
+                    <i data-lucide="chevron-right" style="width: 22px; height: 22px;"></i>
                 </button>
                 <button onclick="slideBestSellers('left')" aria-label="التالي" class="slider-arrow">
-                    <i data-lucide="chevron-left" style="width: 24px; height: 24px;"></i>
+                    <i data-lucide="chevron-left" style="width: 22px; height: 22px;"></i>
                 </button>
             </div>
         </div>
@@ -1559,6 +1625,7 @@
                 <!-- Cards injected here -->
             </div>
         </div>
+        <div class="bs-page-indicator" id="bs-page-indicator"></div>
     </section>
 
     <!-- ══ PRODUCTS SECTION ══ -->
@@ -1780,40 +1847,49 @@
         </div>
     </section>
 
-    <!-- ══ FOOTER ══ -->
     <footer class="reveal"
-        style="background: var(--white); padding: 5rem 8% 2rem; border-top: 1px solid #eee; margin-top: 6rem;">
-        <div
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 4rem; margin-bottom: 4rem;">
-            <div>
-                <h2 style="color: var(--secondary); font-weight: 900; margin-bottom: 1.5rem;">🏰 قصر المكسرات</h2>
-                <p style="color: #7a4a6a; line-height: 1.8;">نحن نهتم بأدق التفاصيل لنقدم لكم أفضل مكسرات وحلويات في
-                    مصر، بجودة ملكية وطعم لا يُنسى.</p>
-            </div>
-            <div>
-                <h3 style="margin-bottom: 1.5rem;">روابط سريعة</h3>
-                <ul style="list-style: none; line-height: 2.5;">
-                    <li><a href="#hero" style="text-decoration: none; color: #555;">الرئيسية</a></li>
-                    <li><a href="#products" style="text-decoration: none; color: #555;">منتجاتنا</a></li>
-                    <li style="display: none;"><a href="#track-order" style="text-decoration: none; color: #555;">تتبع طلبك</a></li>
-                    <li><a href="#contact-form-section" style="text-decoration: none; color: #555;">تواصل معنا</a></li>
-                    <li><a href="admin.html" style="text-decoration: none; color: #555;">لوحة التحكم (الإدارة)</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 style="margin-bottom: 1.5rem;">تواصل معنا</h3>
-                <p style="color: #555; margin-bottom: 0.5rem;">📍 القاهرة، مصر</p>
-                <p style="color: #555; margin-bottom: 0.5rem;">📞 01551407492</p>
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <a href="#" style="color: var(--primary); font-size: 1.5rem;"><i data-lucide="facebook"></i></a>
-                    <a href="#" style="color: var(--primary); font-size: 1.5rem;"><i data-lucide="instagram"></i></a>
-                    <a href="#" style="color: var(--primary); font-size: 1.5rem;"><i data-lucide="twitter"></i></a>
+        style="background: linear-gradient(135deg, #7B5EE0 0%, #9B6DFF 40%, #A87BFF 100%); padding: 5rem 8% 2rem; margin-top: 6rem; position: relative; overflow: hidden;">
+        <!-- Logo Pattern Background -->
+        <div style="position: absolute; inset: 0; opacity: 0.06; background-image: url('logo.png'); background-size: 80px 80px; background-repeat: repeat; pointer-events: none;"></div>
+        <!-- Decorative top wave -->
+        <div style="position: absolute; top: -2px; left: 0; right: 0; height: 60px; background: var(--white); border-radius: 0 0 50% 50%;"></div>
+        
+        <div style="position: relative; z-index: 1;">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 4rem; margin-bottom: 4rem; padding-top: 2rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+                        <img src="logo.png" alt="شعار قصر المكسرات" style="height: 55px; width: auto; filter: brightness(0) invert(1); opacity: 0.9;">
+                        <h2 style="color: #fff; font-weight: 900; margin: 0;">قصر المكسرات</h2>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.8); line-height: 1.9; font-size: 0.95rem;">نحن نهتم بأدق التفاصيل لنقدم لكم أفضل مكسرات وحلويات في
+                        مصر، بجودة ملكية وطعم لا يُنسى.</p>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 1.5rem; color: #fff; font-weight: 800;">روابط سريعة</h3>
+                    <ul style="list-style: none; line-height: 2.5; padding: 0;">
+                        <li><a href="#hero" style="text-decoration: none; color: rgba(255,255,255,0.75); transition: all 0.3s;" onmouseover="this.style.color='#fff'; this.style.paddingRight='8px'" onmouseout="this.style.color='rgba(255,255,255,0.75)'; this.style.paddingRight='0'">← الرئيسية</a></li>
+                        <li><a href="#products" style="text-decoration: none; color: rgba(255,255,255,0.75); transition: all 0.3s;" onmouseover="this.style.color='#fff'; this.style.paddingRight='8px'" onmouseout="this.style.color='rgba(255,255,255,0.75)'; this.style.paddingRight='0'">← منتجاتنا</a></li>
+                        <li style="display: none;"><a href="#track-order" style="text-decoration: none; color: rgba(255,255,255,0.75);">← تتبع طلبك</a></li>
+                        <li><a href="#contact-form-section" style="text-decoration: none; color: rgba(255,255,255,0.75); transition: all 0.3s;" onmouseover="this.style.color='#fff'; this.style.paddingRight='8px'" onmouseout="this.style.color='rgba(255,255,255,0.75)'; this.style.paddingRight='0'">← تواصل معنا</a></li>
+                        <li><a href="admin.html" style="text-decoration: none; color: rgba(255,255,255,0.75); transition: all 0.3s;" onmouseover="this.style.color='#fff'; this.style.paddingRight='8px'" onmouseout="this.style.color='rgba(255,255,255,0.75)'; this.style.paddingRight='0'">← لوحة التحكم</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 1.5rem; color: #fff; font-weight: 800;">تواصل معنا</h3>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;">📍 القاهرة، مصر</p>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">📞 01551407492</p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <a href="#" style="background: rgba(255,255,255,0.15); color: #fff; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-3px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'"><i data-lucide="facebook" style="width:20px; height:20px;"></i></a>
+                        <a href="#" style="background: rgba(255,255,255,0.15); color: #fff; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-3px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'"><i data-lucide="instagram" style="width:20px; height:20px;"></i></a>
+                        <a href="#" style="background: rgba(255,255,255,0.15); color: #fff; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-3px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'"><i data-lucide="twitter" style="width:20px; height:20px;"></i></a>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div
-            style="border-top: 1px solid #eee; padding-top: 2rem; text-align: center; color: #aaa; font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-            <p>&copy; ٢٠٢٦ قصر المكسرات — جميع الحقوق محفوظة.</p>
+            <div
+                style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 2rem; text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <p>&copy; ٢٠٢٦ قصر المكسرات — جميع الحقوق محفوظة.</p>
+            </div>
         </div>
     </footer>
 
@@ -1908,7 +1984,14 @@
 
         async function init() {
             const { data: catData } = await supabaseClient.from('categories').select('*');
-            categories = catData || []; renderCategories();
+            categories = (catData || []).map(cat => {
+                if (cat.slug && cat.slug.includes('||')) {
+                    const parts = cat.slug.split('||');
+                    return { ...cat, slug: parts[0], image_url: parts[1] };
+                }
+                return { ...cat, image_url: null };
+            });
+            renderCategories();
             const { data: prodData } = await supabaseClient.from('products').select('*').eq('is_active', true);
             allProducts = prodData || []; renderProducts();
             loadTestimonials();
@@ -2036,9 +2119,9 @@
                 if (priceInfo.hasMultipleWeights) {
                     weightSelectorHtml = `
                     <div class="weight-selector" onclick="event.stopPropagation();">
-                        <button id="btn-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">ربع كيلو</button>
-                        <button id="btn-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">نصف كيلو</button>
-                        <button id="btn-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">كيلو</button>
+                        <button id="btn-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">250 جم</button>
+                        <button id="btn-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">500 جم</button>
+                        <button id="btn-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">1 كجم</button>
                     </div>
                     `;
                 } else {
@@ -2095,9 +2178,9 @@
                             if (priceInfo.hasMultipleWeights) {
                                 weightSelectorHtml = `
                                 <div class="weight-selector" onclick="event.stopPropagation();" style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
-                                    <button id="btn-bs-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">ربع كيلو</button>
-                                    <button id="btn-bs-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">نصف كيلو</button>
-                                    <button id="btn-bs-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">كيلو</button>
+                                    <button id="btn-bs-${p.id}-250g" class="weight-btn weight-btn-${p.id} ${currentWeight === '250g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '250g', event)">250 جم</button>
+                                    <button id="btn-bs-${p.id}-500g" class="weight-btn weight-btn-${p.id} ${currentWeight === '500g' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '500g', event)">500 جم</button>
+                                    <button id="btn-bs-${p.id}-1kg" class="weight-btn weight-btn-${p.id} ${currentWeight === '1kg' ? 'active-weight' : ''}" onclick="setProductWeight(${p.id}, '1kg', event)">1 كجم</button>
                                 </div>
                                 `;
                             } else {
@@ -2105,27 +2188,28 @@
                             }
                             
                             return `
-                            <div class="card glass best-seller-card" onclick="addToCart(${p.id})" style="flex: 0 0 310px; scroll-snap-align: start; margin-bottom: 0.5rem;">
-                                <div class="best-seller-badge">
-                                    <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
-                                    <span>الأكثر مبيعاً 🔥</span>
+                            <div class="best-seller-card" onclick="addToCart(${p.id})" style="flex: 0 0 310px; scroll-snap-align: start;">
+                                <div class="card-img" onclick="viewImage('${getImageUrl(p.image_url)}', '${p.name}', event)">
+                                    <div class="best-seller-badge">
+                                        <span>Sale</span>
+                                    </div>
+                                    <img src="${getImageUrl(p.image_url)}" alt="${p.name}">
                                 </div>
-                                <div class="card-img" onclick="viewImage('${getImageUrl(p.image_url)}', '${p.name}', event)"><img src="${getImageUrl(p.image_url)}" alt="${p.name}"></div>
-                                <h3>${p.name}</h3>
                                 
+                                <h3>${p.name}</h3>
+                                <div class="subtitle">قصر المكسرات</div>
+                                
+                                <div id="price-bs-${p.id}" class="price">${priceInfo.selectedPrice} EGP</div>
                                 ${weightSelectorHtml}
 
-                                <div class="card-footer">
-                                    <div id="price-bs-${p.id}" class="price">${priceInfo.selectedPrice} EGP</div>
-                                    <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
-                                        <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
-                                        أضف للسلة
-                                    </button>
-                                </div>
+                                <button class="add-btn-outline" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
+                                    أضف للسلة
+                                </button>
                             </div>
                             `;
                         }).join('');
                         lucide.createIcons();
+                        setTimeout(updateBsPageIndicator, 100);
                     }
                 }
             } catch (e) {
@@ -2135,9 +2219,22 @@
 
         function slideBestSellers(direction) {
             const grid = document.getElementById('best-sellers-grid');
-            const cardWidth = 342; // card width (310px) + gap (32px)
+            const cardWidth = 328; // card width (310px) + gap (18px)
             const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
             grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            setTimeout(updateBsPageIndicator, 400);
+        }
+
+        function updateBsPageIndicator() {
+            const grid = document.getElementById('best-sellers-grid');
+            const indicator = document.getElementById('bs-page-indicator');
+            if (!grid || !indicator) return;
+            const cards = grid.children.length;
+            if (cards === 0) { indicator.innerHTML = ''; return; }
+            const visibleCards = Math.round(grid.offsetWidth / 328) || 1;
+            const totalPages = Math.ceil(cards / visibleCards);
+            const currentPage = Math.min(totalPages, Math.round(grid.scrollLeft / (328 * visibleCards)) + 1);
+            indicator.innerHTML = `<span class="current-page">${currentPage}</span> / ${totalPages}`;
         }
 
         function openImageLightbox(url, name) {
@@ -2182,7 +2279,7 @@
             let weightLabel = '';
             
             if (priceInfo.hasMultipleWeights) {
-                weightLabel = weight === '500g' ? 'نصف كيلو' : (weight === '1kg' ? 'كيلو' : 'ربع كيلو');
+                weightLabel = weight === '500g' ? '500 جم' : (weight === '1kg' ? '1 كجم' : '250 جم');
                 cartItemId = `${id}-${weight}`;
             }
             
@@ -2201,6 +2298,10 @@
                 });
             }
             updateCart();
+            const overlay = document.getElementById('cart-overlay');
+            if (overlay.style.display !== 'flex') {
+                toggleCart();
+            }
         }
 
         function updateCart() {

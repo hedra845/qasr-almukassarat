@@ -193,7 +193,14 @@
     async function logout() { await supabaseClient.auth.signOut(); window.location.reload(); }
 
     async function loadData() {
-        const { data: c } = await supabaseClient.from('categories').select('*'); categories = c || [];
+        const { data: c } = await supabaseClient.from('categories').select('*'); 
+        categories = (c || []).map(cat => {
+            if (cat.slug && cat.slug.includes('||')) {
+                const parts = cat.slug.split('||');
+                return { ...cat, slug: parts[0], image_url: parts[1] };
+            }
+            return { ...cat, image_url: null };
+        });
         const { data: p } = await supabaseClient.from('products').select('*'); products = p || [];
         const { data: o } = await supabaseClient.from('orders').select('*').order('created_at', {ascending: false}); orders = o || [];
         const { data: cp } = await supabaseClient.from('coupons').select('*'); coupons = cp || [];
@@ -670,7 +677,7 @@
 
     async function saveCat(id) {
         const name = document.getElementById('m-name').value;
-        const slug = document.getElementById('m-slug').value;
+        const slugInput = document.getElementById('m-slug').value;
         const file = document.getElementById('m-cat-file') ? document.getElementById('m-cat-file').files[0] : null;
         
         if (!name) return alert('يرجى إدخال اسم القسم');
@@ -678,15 +685,28 @@
         let imageUrl = id ? categories.find(x => x.id === id).image_url : null;
 
         if (file) {
-            const fileName = `cat_${Date.now()}_${file.name}`;
+            const ext = file.name.split('.').pop() || 'png';
+            const fileName = `cat_${Date.now()}.${ext}`;
             const { data, error } = await supabaseClient.storage.from('products').upload(fileName, file);
             if (error) return alert('خطأ في رفع الصورة: ' + error.message);
             imageUrl = fileName;
         }
 
-        const data = { name, slug, image_url: imageUrl };
-        if(id) await supabaseClient.from('categories').update(data).eq('id', id);
-        else await supabaseClient.from('categories').insert(data);
+        const finalSlug = slugInput || `cat_${Date.now()}`;
+        const combinedSlug = imageUrl ? `${finalSlug}||${imageUrl}` : finalSlug;
+
+        // Save WITHOUT image_url column to avoid DB errors
+        const data = { name, slug: combinedSlug };
+        
+        let res;
+        if(id) res = await supabaseClient.from('categories').update(data).eq('id', id);
+        else res = await supabaseClient.from('categories').insert(data);
+        
+        if (res.error) {
+            alert('خطأ أثناء الحفظ في قاعدة البيانات: \n' + res.error.message);
+            return;
+        }
+        
         closeModal(); loadData();
     }
 
