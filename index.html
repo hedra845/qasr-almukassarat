@@ -2442,9 +2442,10 @@
                 shippingCost = parseFloat(opt.getAttribute('data-cost')) || 0;
             }
             const grandTotal = finalTotal + shippingCost;
+            const grandTotalFormatted = parseFloat(grandTotal.toFixed(2));
             
             let shippingHtml = shippingCost > 0 ? `<div style="font-size: 0.85rem; color: var(--primary); font-weight: normal; margin-top: 4px;">شامل الشحن (${shippingCost} ج.م)</div>` : '';
-            document.getElementById('cart-total').innerHTML = `${grandTotal} EGP ${shippingHtml}`;
+            document.getElementById('cart-total').innerHTML = `${grandTotalFormatted} EGP ${shippingHtml}`;
             document.getElementById('cart-count').innerText = cart.length;
             
             const clearBtn = document.getElementById('clear-cart-btn');
