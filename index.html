@@ -2116,13 +2116,13 @@
             // Update normal price label
             const priceEl = document.getElementById(`price-${productId}`);
             if (priceEl) {
-                priceEl.innerText = `${priceInfo.selectedPrice} EGP`;
+                priceEl.innerText = `EGP ${priceInfo.selectedPrice * 100}`;
             }
             
             // Update best seller price label
             const priceBsEl = document.getElementById(`price-bs-${productId}`);
             if (priceBsEl) {
-                priceBsEl.innerText = `${priceInfo.selectedPrice} EGP`;
+                priceBsEl.innerText = `EGP ${priceInfo.selectedPrice * 100}`;
             }
             
             // Update the active weight buttons inside BOTH normal and best seller cards if they exist
@@ -2166,7 +2166,7 @@
                     ${weightSelectorHtml}
 
                     <div class="card-footer">
-                        <div id="price-${p.id}" class="price">EGP ${p.price}</div>
+                        <div id="price-${p.id}" class="price">EGP ${p.price * 100}</div>
                         <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
                             <i data-lucide="shopping-cart" style="width:18px; height:18px; margin-left: 5px;"></i>
                             أضف للسلة
@@ -2227,7 +2227,7 @@
                                 ${weightSelectorHtml}
 
                                 <div class="card-footer">
-                                    <div id="price-bs-${p.id}" class="price">EGP ${p.price}</div>
+                                    <div id="price-bs-${p.id}" class="price">EGP ${p.price * 100}</div>
                                     <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
                                         <i data-lucide="shopping-cart" style="width:18px; height:18px; margin-left: 5px;"></i>
                                         أضف للسلة
@@ -2299,20 +2299,19 @@
 
         function addToCart(id) {
             const prod = allProducts.find(p => p.id === id);
-            let itemPrice = parseFloat(prod.price) || 0;
+            let basePrice = parseFloat(prod.price) || 0; // price per gram
             let cartItemId = id;
             
             const exists = cart.find(item => item.cartItemId === cartItemId);
             if (exists) {
-                exists.qty += 250;
+                exists.qty += 100;
             } else {
                 cart.push({
                     cartItemId: cartItemId,
                     id: id,
                     name: prod.name,
-                    price: itemPrice,
-                    weight: '',
-                    qty: 250,
+                    basePrice: basePrice,
+                    qty: 100,
                     image_url: prod.image_url
                 });
             }
@@ -2325,29 +2324,79 @@
 
         function updateCart() {
             const container = document.getElementById('cart-items');
-            container.innerHTML = cart.map(item => `
+            const weightOptions = [100, 200, 250, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000];
+            container.innerHTML = cart.map(item => {
+                let optionsHtml = '<option value="0" style="color:red;">إزالة 🗑️</option>';
+                let found = false;
+                weightOptions.forEach(w => {
+                    if (item.qty == w) found = true;
+                    optionsHtml += `<option value="${w}" ${item.qty == w ? 'selected' : ''}>${w}</option>`;
+                });
+                if (!found && item.qty > 0) {
+                    optionsHtml += `<option value="${item.qty}" selected>${item.qty}</option>`;
+                }
+                
+                return `
             <div class="cart-item">
-                <div><strong>${item.name}</strong><br><small>${item.price} EGP x ${item.qty}</small></div>
+                <div><strong>${item.name}</strong><br><small id="item-details-${item.cartItemId}" style="color: var(--primary); font-weight: bold;">${item.basePrice} ج.م × ${item.qty} جم = ${(item.basePrice * item.qty).toFixed(2)} ج.م</small></div>
                 <div style="display:flex; gap:10px; align-items:center;">
-                    <button onclick="changeQty('${item.cartItemId}', -50)" style="width:30px; height:30px; border-radius:50%; border:1px solid #ddd; display:flex; align-items:center; justify-content:center; cursor:pointer;">-</button>
-                    <input type="number" min="50" step="50" value="${item.qty}" onchange="setQty('${item.cartItemId}', this.value)" style="width: 60px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 4px;">
+                    <select onchange="setQty('${item.cartItemId}', this.value)" style="width: 80px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 4px; font-weight: bold; background: #fff; cursor: pointer; color: var(--secondary);">
+                        ${optionsHtml}
+                    </select>
                     <span style="font-size: 0.8rem; font-weight: bold; margin-right: -5px;">جم</span>
-                    <button onclick="changeQty('${item.cartItemId}', 50)" style="width:30px; height:30px; border-radius:50%; border:1px solid #ddd; display:flex; align-items:center; justify-content:center; cursor:pointer;">+</button>
                 </div>
             </div>
-        `).join('');
-            const total = cart.reduce((s, c) => s + (c.price * c.qty), 0);
+            `}).join('');
+            const total = cart.reduce((s, c) => s + (c.basePrice * c.qty), 0);
             const finalTotal = activeCoupon ? total - (total * (activeCoupon.discount_percent / 100)) : total;
             document.getElementById('cart-total').innerText = `${finalTotal} EGP`;
-            document.getElementById('cart-count').innerText = cart.reduce((s, c) => s + c.qty, 0);
+            document.getElementById('cart-count').innerText = cart.length;
         }
 
         function changeQty(cartItemId, delta) {
             const item = cart.find(x => x.cartItemId === cartItemId);
             if (!item) return;
-            item.qty += delta;
-            if (item.qty <= 0) cart = cart.filter(x => x.cartItemId !== cartItemId);
+            let newQty = item.qty + delta;
+            if (newQty < 0) newQty = 0;
+            if (newQty <= 0) {
+                cart = cart.filter(x => x.cartItemId !== cartItemId);
+            } else {
+                item.qty = newQty;
+            }
             updateCart();
+        }
+
+        // Update quantity directly from input field
+        function setQty(cartItemId, value) {
+            const itemIndex = cart.findIndex(i => i.cartItemId == cartItemId);
+            if (itemIndex === -1) return;
+            const item = cart[itemIndex];
+            
+            let newQty = 0;
+            if (value !== "") {
+                const num = parseInt(value);
+                if (!isNaN(num) && num >= 0) {
+                    newQty = num;
+                }
+            }
+
+            if (newQty <= 0) {
+                cart.splice(itemIndex, 1);
+                updateCart();
+                return;
+            }
+            
+            item.qty = newQty;
+            
+            const itemSmallTxt = document.getElementById('item-details-' + item.cartItemId);
+            if (itemSmallTxt) {
+                itemSmallTxt.innerText = `${item.basePrice} ج.م × ${item.qty} جم = ${(item.basePrice * item.qty).toFixed(2)} ج.م`;
+            }
+            
+            const total = cart.reduce((s, c) => s + (c.basePrice * c.qty), 0);
+            const finalTotal = activeCoupon ? total - (total * (activeCoupon.discount_percent / 100)) : total;
+            document.getElementById('cart-total').innerText = `${finalTotal} EGP`;
+            document.getElementById('cart-count').innerText = cart.length;
         }
 
         function toggleCart() {
@@ -2381,7 +2430,7 @@
 
             if (!name || !phone || !city || !addr) return alert('يرجى ملء كافة البيانات');
 
-            const total = cart.reduce((s, c) => s + (c.price * c.qty), 0);
+            const total = cart.reduce((s, c) => s + (c.basePrice * c.qty), 0);
             const finalTotal = activeCoupon ? total - (total * (activeCoupon.discount_percent / 100)) : total;
 
             const itemsSummary = cart.map(item => `${item.name} x${item.qty}`).join(' - ');

@@ -594,19 +594,11 @@
             </div>
             <input id="m-name" value="${p.name}" placeholder="الاسم">
             
-            <label style="display:block; text-align:right; margin: 0.8rem 0 0.3rem; font-weight:700; font-size:0.85rem; color:var(--text-soft);">الأسعار حسب الوزن (ربع كيلو إلزامي، الباقي اختياري):</label>
+            <label style="display:block; text-align:right; margin: 0.8rem 0 0.3rem; font-weight:700; font-size:0.85rem; color:var(--text-soft);">سعر الجرام (جرام):</label>
             <div style="display:flex; gap:10px; margin-bottom:1rem;">
                 <div style="flex:1;">
-                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">ربع كيلو (250g)</label>
-                    <input id="m-price-250" type="number" value="${p250}" placeholder="ربع كيلو" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
-                </div>
-                <div style="flex:1;">
-                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">نصف كيلو (500g)</label>
-                    <input id="m-price-500" type="number" value="${p500 || ''}" placeholder="نصف كيلو" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
-                </div>
-                <div style="flex:1;">
-                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">كيلو (1kg)</label>
-                    <input id="m-price-1000" type="number" value="${p1000 || ''}" placeholder="كيلو" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
+                    <label style="display:block; text-align:right; font-size:0.75rem; color:#888;">السعر للجرام</label>
+                    <input id="m-price-gram" type="number" value="${p250}" placeholder="سعر الجرام" style="margin-bottom:0; padding: 0.6rem 0.8rem;">
                 </div>
             </div>
 
@@ -624,13 +616,11 @@
 
     async function saveProduct(id) {
         const name = document.getElementById('m-name').value;
-        const p250 = document.getElementById('m-price-250').value;
-        const p500 = document.getElementById('m-price-500').value;
-        const p1000 = document.getElementById('m-price-1000').value;
+        const pGram = document.getElementById('m-price-gram').value;
         const cat = document.getElementById('m-cat').value;
         const file = document.getElementById('m-file').files[0];
 
-        if (!name || !p250) {
+        if (!name || !pGram) {
             return alert('يرجى إدخال اسم المنتج وسعر الربع كيلو على الأقل');
         }
 
@@ -643,8 +633,8 @@
             imageUrl = fileName;
         }
 
-        const weightData = `250g:${p250}|500g:${p500 || 0}|1kg:${p1000 || 0}`;
-        const data = { name, price: p250, category_id: cat, image_url: imageUrl, weight: weightData, is_active: true };
+        const weightData = `gram:${pGram}`;
+        const data = { name, price: pGram, category_id: cat, image_url: imageUrl, weight: weightData, is_active: true };
         
         if(id) await supabaseClient.from('products').update(data).eq('id', id);
         else await supabaseClient.from('products').insert(data);
