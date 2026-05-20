@@ -332,8 +332,11 @@
             `).join('') + `</table>`;
         } else if (activeTab === 'cats') {
             container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>📁 الأقسام</h2><button class="admin-btn" onclick="showCatModal()">+ إضافة قسم</button></div>
-            <table><tr><th>الاسم</th><th>التحكم</th></tr>` + categories.map(c => `
-                <tr><td>${c.name}</td><td>
+            <table><tr><th>صورة</th><th>الاسم</th><th>التحكم</th></tr>` + categories.map(c => `
+                <tr>
+                    <td><img src="${getImageUrl(c.image_url)}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;"></td>
+                    <td>${c.name}</td>
+                    <td>
                     <button onclick="showCatModal(${c.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
                     <button onclick="deleteItem('categories', ${c.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
                 </td></tr>
@@ -644,17 +647,44 @@
 
     // Cat Modal
     function showCatModal(id = null) {
-        const c = id ? categories.find(x => x.id === id) : { name: '', slug: '' };
+        const c = id ? categories.find(x => x.id === id) : { name: '', slug: '', image_url: '' };
         openModal(`
             <h3>${id ? 'تعديل قسم' : 'إضافة قسم'}</h3>
+            <div style="text-align:center; margin-bottom:1rem;">
+                <img id="m-cat-img-preview" src="${getImageUrl(c.image_url) || 'https://via.placeholder.com/100'}" class="img-preview">
+                <input type="file" id="m-cat-file" style="display:none" onchange="previewCatFile(this)">
+                <button class="admin-btn secondary" onclick="document.getElementById('m-cat-file').click()" style="display:block; margin:0 auto; font-size:0.8rem;">تغيير الصورة</button>
+            </div>
             <input id="m-name" value="${c.name}" placeholder="الاسم">
             <input id="m-slug" value="${c.slug || ''}" placeholder="Slug">
             <button class="admin-btn" onclick="saveCat(${id})">حفظ</button>
             <button class="admin-btn secondary" onclick="closeModal()">إلغاء</button>
         `);
     }
+
+    function previewCatFile(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => document.getElementById('m-cat-img-preview').src = e.target.result;
+        reader.readAsDataURL(input.files[0]);
+    }
+
     async function saveCat(id) {
-        const data = { name: document.getElementById('m-name').value, slug: document.getElementById('m-slug').value };
+        const name = document.getElementById('m-name').value;
+        const slug = document.getElementById('m-slug').value;
+        const file = document.getElementById('m-cat-file') ? document.getElementById('m-cat-file').files[0] : null;
+        
+        if (!name) return alert('يرجى إدخال اسم القسم');
+
+        let imageUrl = id ? categories.find(x => x.id === id).image_url : null;
+
+        if (file) {
+            const fileName = `cat_${Date.now()}_${file.name}`;
+            const { data, error } = await supabaseClient.storage.from('products').upload(fileName, file);
+            if (error) return alert('خطأ في رفع الصورة: ' + error.message);
+            imageUrl = fileName;
+        }
+
+        const data = { name, slug, image_url: imageUrl };
         if(id) await supabaseClient.from('categories').update(data).eq('id', id);
         else await supabaseClient.from('categories').insert(data);
         closeModal(); loadData();

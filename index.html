@@ -317,6 +317,72 @@
             transform: scale(1.1);
         }
 
+        /* Category Image Cards */
+        .category-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            text-decoration: none;
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .category-img-wrapper {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            border: 2px solid var(--secondary);
+            padding: 5px;
+            margin-bottom: 12px;
+            background: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(155, 109, 255, 0.08);
+        }
+
+        .category-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .category-card .cat-title {
+            color: var(--secondary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover .category-img-wrapper {
+            border-color: var(--primary);
+            box-shadow: 0 12px 30px rgba(255, 90, 159, 0.2);
+        }
+
+        .category-card:hover .cat-title {
+            color: var(--primary);
+        }
+
+        .category-card.active .category-img-wrapper {
+            border-color: var(--primary);
+            box-shadow: 0 12px 30px rgba(255, 90, 159, 0.3);
+            background: linear-gradient(135deg, rgba(255, 90, 159, 0.1), rgba(155, 109, 255, 0.1));
+        }
+
+        .category-card.active .cat-title {
+            color: var(--primary);
+        }
+
         /* Hero */
         #hero {
             min-height: 90vh;
@@ -626,8 +692,8 @@
         }
 
         .card .add-btn {
-            width: 45px;
             height: 45px;
+            padding: 0 1rem;
             border: none;
             border-radius: 14px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -635,13 +701,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 6px;
             cursor: pointer;
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 8px 20px rgba(255, 90, 159, 0.3);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            white-space: nowrap;
         }
 
         .card .add-btn:hover {
-            transform: scale(1.1) rotate(90deg);
+            transform: translateY(-3px) scale(1.05);
             box-shadow: 0 12px 25px rgba(155, 109, 255, 0.4);
         }
 
@@ -1219,8 +1290,9 @@
                 font-size: 1.1rem;
             }
             .card .add-btn {
-                width: 35px;
                 height: 35px;
+                padding: 0 0.8rem;
+                font-size: 0.85rem;
                 border-radius: 10px;
             }
 
@@ -1346,8 +1418,9 @@
                     font-size: 0.95rem !important;
                 }
                 .card .add-btn {
-                    width: 32px !important;
                     height: 32px !important;
+                    padding: 0 0.6rem !important;
+                    font-size: 0.75rem !important;
                 }
             }
         }
@@ -1856,10 +1929,22 @@
 
         function renderCategories() {
             const container = document.getElementById('cat-list');
-            let html = `<button class="cat-btn ${activeCat === 'all' ? 'active' : ''}" onclick="filterByCat('all')"><i data-lucide="layout-grid"></i> الكل</button>`;
+            let html = `
+                <div class="category-card ${activeCat === 'all' ? 'active' : ''}" onclick="filterByCat('all')">
+                    <div class="category-img-wrapper" style="display:flex;align-items:center;justify-content:center;background:#fff0f6;">
+                        <i data-lucide="layout-grid" style="width:50px;height:50px;color:var(--primary)"></i>
+                    </div>
+                    <div class="cat-title">الكل <i data-lucide="arrow-left" style="width:18px;height:18px;"></i></div>
+                </div>`;
             categories.forEach(c => {
-                const iconName = getCategoryIcon(c.name);
-                html += `<button class="cat-btn ${activeCat == c.id ? 'active' : ''}" onclick="filterByCat(${c.id})"><i data-lucide="${iconName}"></i> ${c.name}</button>`;
+                const imgSrc = c.image_url ? getImageUrl(c.image_url) : 'https://via.placeholder.com/150?text=' + encodeURIComponent(c.name);
+                html += `
+                <div class="category-card ${activeCat == c.id ? 'active' : ''}" onclick="filterByCat(${c.id})">
+                    <div class="category-img-wrapper">
+                        <img src="${imgSrc}" alt="${c.name}">
+                    </div>
+                    <div class="cat-title">${c.name} <i data-lucide="arrow-left" style="width:18px;height:18px;"></i></div>
+                </div>`;
             });
             container.innerHTML = html;
             lucide.createIcons();
@@ -1970,7 +2055,8 @@
                     <div class="card-footer">
                         <div id="price-${p.id}" class="price">${priceInfo.selectedPrice} EGP</div>
                         <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
-                            <i data-lucide="plus" style="width:22px; height:22px;"></i>
+                            <i data-lucide="plus" style="width:18px; height:18px;"></i>
+                            أضف للسلة
                         </button>
                     </div>
                 </div>
@@ -2032,7 +2118,8 @@
                                 <div class="card-footer">
                                     <div id="price-bs-${p.id}" class="price">${priceInfo.selectedPrice} EGP</div>
                                     <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})" title="إضافة للسلة">
-                                        <i data-lucide="plus" style="width: 22px; height: 22px;"></i>
+                                        <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                                        أضف للسلة
                                     </button>
                                 </div>
                             </div>
