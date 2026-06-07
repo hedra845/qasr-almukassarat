@@ -2239,6 +2239,10 @@
             if (clearBtn) {
                 clearBtn.style.display = val ? 'flex' : 'none';
             }
+            if (val && activeCat !== 'all') {
+                activeCat = 'all';
+                renderCategories();
+            }
             renderProducts();
         }
 
