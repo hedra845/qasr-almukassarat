@@ -101,3 +101,104 @@ INSERT INTO store_settings (key, value) VALUES
 ('facebook', ''),
 ('instagram', ''),
 ('tiktok', '');
+
+-- 8. Coupons Table
+CREATE TABLE IF NOT EXISTS coupons (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    discount_percent INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 9. Shipping Zones Table
+CREATE TABLE IF NOT EXISTS shipping_zones (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    cost DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 10. Best Sellers Table
+CREATE TABLE IF NOT EXISTS best_sellers (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER REFERENCES products(id) ON DELETE CASCADE UNIQUE,
+    sales_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =======================================================
+-- Row Level Security (RLS) Configuration & Policies
+-- Run these commands in your Supabase SQL Editor to fix authorization/permission errors
+-- =======================================================
+
+-- Enable RLS on all tables
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE store_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shipping_zones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE best_sellers ENABLE ROW LEVEL SECURITY;
+
+-- 1. Policies for 'best_sellers'
+CREATE POLICY "Allow public read access on best_sellers" ON best_sellers FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert on best_sellers" ON best_sellers FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update on best_sellers" ON best_sellers FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on best_sellers" ON best_sellers FOR DELETE TO authenticated USING (true);
+
+-- 2. Policies for 'categories'
+CREATE POLICY "Allow public read access on categories" ON categories FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert on categories" ON categories FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update on categories" ON categories FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on categories" ON categories FOR DELETE TO authenticated USING (true);
+
+-- 3. Policies for 'products'
+CREATE POLICY "Allow public read access on products" ON products FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert on products" ON products FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update on products" ON products FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on products" ON products FOR DELETE TO authenticated USING (true);
+
+-- 4. Policies for 'orders'
+CREATE POLICY "Allow public insert on orders" ON orders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated select on orders" ON orders FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Allow authenticated update on orders" ON orders FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on orders" ON orders FOR DELETE TO authenticated USING (true);
+
+-- 5. Policies for 'order_items'
+CREATE POLICY "Allow public insert on order_items" ON order_items FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated select on order_items" ON order_items FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Allow authenticated update on order_items" ON order_items FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on order_items" ON order_items FOR DELETE TO authenticated USING (true);
+
+-- 6. Policies for 'contact_messages'
+CREATE POLICY "Allow public insert on contact_messages" ON contact_messages FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated select on contact_messages" ON contact_messages FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Allow authenticated update on contact_messages" ON contact_messages FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on contact_messages" ON contact_messages FOR DELETE TO authenticated USING (true);
+
+-- 7. Policies for 'newsletter_subscriptions'
+CREATE POLICY "Allow public insert on newsletter_subscriptions" ON newsletter_subscriptions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated select on newsletter_subscriptions" ON newsletter_subscriptions FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Allow authenticated update on newsletter_subscriptions" ON newsletter_subscriptions FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on newsletter_subscriptions" ON newsletter_subscriptions FOR DELETE TO authenticated USING (true);
+
+-- 8. Policies for 'store_settings'
+CREATE POLICY "Allow public read access on store_settings" ON store_settings FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert on store_settings" ON store_settings FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update on store_settings" ON store_settings FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on store_settings" ON store_settings FOR DELETE TO authenticated USING (true);
+
+-- 9. Policies for 'coupons'
+CREATE POLICY "Allow public read access on coupons" ON coupons FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert on coupons" ON coupons FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update on coupons" ON coupons FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on coupons" ON coupons FOR DELETE TO authenticated USING (true);
+
+-- 10. Policies for 'shipping_zones'
+CREATE POLICY "Allow public read access on shipping_zones" ON shipping_zones FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated insert on shipping_zones" ON shipping_zones FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Allow authenticated update on shipping_zones" ON shipping_zones FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated delete on shipping_zones" ON shipping_zones FOR DELETE TO authenticated USING (true);

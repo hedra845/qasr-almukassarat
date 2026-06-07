@@ -163,6 +163,7 @@
     let categories = [], products = [], orders = [], coupons = [], messages = [], bestSellers = [], shippingZones = [];
     let storeSettings = {};
     let orderSearchQuery = '';
+    let productSearchQuery = '';
     let orderStatusFilter = 'all';
     let orderStartDate = '';
     let orderEndDate = '';
@@ -352,18 +353,46 @@
                 `;
             }).join(''));
         } else if (activeTab === 'products') {
-            container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>🥜 المنتجات</h2><button class="admin-btn" onclick="showProductModal()">+ إضافة منتج</button></div>
-            <table><tr><th>صورة</th><th>الاسم</th><th>السعر</th><th>التحكم</th></tr>` + products.map(p => `
-                <tr>
-                    <td><img src="${getImageUrl(p.image_url)}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;"></td>
-                    <td>${p.name}</td>
-                    <td>${p.price} EGP</td>
-                    <td>
-                        <button onclick="showProductModal(${p.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
-                        <button onclick="deleteItem('products', ${p.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
-                    </td>
-                </tr>
-            `).join('') + `</table>`;
+            let filteredProducts = products.filter(p => {
+                return !productSearchQuery ? true : (
+                    p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                    (p.id && String(p.id).includes(productSearchQuery))
+                );
+            });
+
+            container.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:2rem;">
+                    <h2>🥜 المنتجات (${filteredProducts.length})</h2>
+                    <button class="admin-btn" onclick="showProductModal()" style="margin: 0;">+ إضافة منتج</button>
+                </div>
+                
+                <div style="display:flex; gap:12px; margin-bottom:1.5rem; flex-wrap:wrap; background:#fff; padding:1.2rem; border-radius:20px; box-shadow: var(--shadow);">
+                    <input type="text" placeholder="🔍 ابحث باسم المنتج أو الرقم..." 
+                        value="${productSearchQuery}" 
+                        oninput="productSearchQuery = this.value; renderTab();" 
+                        style="flex:1; margin-bottom:0; padding:0.8rem 1.2rem; border-radius:12px; border:1.5px solid #eee; min-width: 250px;">
+                </div>
+                
+                <table>
+                    <tr>
+                        <th>صورة</th>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                        <th>التحكم</th>
+                    </tr>
+                    ${filteredProducts.map(p => `
+                        <tr>
+                            <td><img src="${getImageUrl(p.image_url)}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;"></td>
+                            <td>${p.name}</td>
+                            <td>${p.price} EGP</td>
+                            <td>
+                                <button onclick="showProductModal(${p.id})" style="color:blue; border:none; background:none; cursor:pointer;">تعديل</button>
+                                <button onclick="deleteItem('products', ${p.id})" style="color:red; border:none; background:none; cursor:pointer; margin-right:10px;">حذف</button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
         } else if (activeTab === 'cats') {
             container.innerHTML = `<div style="display:flex; justify-content:space-between;"><h2>📁 الأقسام</h2><button class="admin-btn" onclick="showCatModal()">+ إضافة قسم</button></div>
             <table><tr><th>صورة</th><th>الاسم</th><th>التحكم</th></tr>` + categories.map(c => `
